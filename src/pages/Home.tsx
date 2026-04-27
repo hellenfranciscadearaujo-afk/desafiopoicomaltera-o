@@ -1,13 +1,14 @@
 /**
  * Home.tsx — Splash inicial antes do quiz
  *
- * Estrutura otimizada para mobile:
- * 1. Logo no topo
- * 2. Slideshow compacto (220px) logo abaixo
- * 3. Bloco de prova social próximo (estrelas + headline + subheadline)
- * 4. Barra de carregamento → Botão CTA (estilo navy do quiz)
+ * Estrutura (estilo quiz):
+ * 1. Logo + barra de progresso azul (header padrão do quiz)
+ * 2. Slideshow em card branco com borda e sombra
+ * 3. Bloco de prova social em card azul claro
+ * 4. Headline + subheadline
+ * 5. Footer fixo: barra de carregamento → botão CTA + badges
  *
- * O botão CTA dispara QuizStart (App.tsx) e navega para o quiz.
+ * Pixel: QuizStart dispara no clique do botão (via App.tsx).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -53,64 +54,81 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Logo */}
-      <header className="flex items-center justify-center px-5 pt-4 pb-1">
-        <img src={logo} alt="DesafioPOI" className="h-5 w-auto" />
+    <div className="quiz-shell">
+      {/* Header — logo + barra de progresso azul fina */}
+      <header className="quiz-header">
+        <div className="flex items-center justify-between">
+          <div className="h-9 w-9" />
+          <img src={logo} alt="DesafioPOI" className="h-5 w-auto" />
+          <div className="h-9 w-9" />
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: "8%", background: "var(--gradient-primary)" }}
+          />
+        </div>
       </header>
 
-      {/* Slideshow compacto */}
-      <div className="px-5 pt-1">
-        <div
-          className="relative mx-auto w-full"
-          style={{ maxWidth: "220px", aspectRatio: "1 / 1" }}
-        >
-          {slides.map((src, i) => (
-            <img
-              key={i}
-              src={src}
-              alt=""
-              className="absolute inset-0 h-full w-full object-contain"
-              style={{
-                opacity: i === current ? 1 : 0,
-                transition: "opacity 0.6s ease-in-out",
-              }}
-              loading="eager"
-              fetchPriority="high"
-              decoding="sync"
-            />
-          ))}
-        </div>
-      </div>
+      {/* Body */}
+      <main className="flex-1 overflow-y-auto px-5 pb-3 pt-3">
+        <div className="flex flex-col gap-3">
 
-      {/* Bloco de prova social — compacto, próximo do slideshow */}
-      <div className="flex flex-col gap-2 px-5 pt-3">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-0.5 flex-shrink-0">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} width="15" height="15" viewBox="0 0 24 24" fill="#e8a400">
-                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              </svg>
-            ))}
+          {/* Slideshow em card branco com borda */}
+          <div className="overflow-hidden rounded-2xl border border-border bg-card p-3 shadow-sm">
+            <div
+              className="relative mx-auto w-full"
+              style={{ maxWidth: "260px", aspectRatio: "1 / 1" }}
+            >
+              {slides.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-contain"
+                  style={{
+                    opacity: i === current ? 1 : 0,
+                    transition: "opacity 0.6s ease-in-out",
+                  }}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="sync"
+                />
+              ))}
+            </div>
           </div>
-          <p className="text-[13px] text-foreground leading-snug">
-            <strong>+10.000 tutores</strong> já transformaram seus cães
+
+          {/* Bloco de prova social em card azul claro */}
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-accent px-3 py-2.5">
+            <div className="flex gap-0.5 flex-shrink-0">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#e8a400">
+                  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                </svg>
+              ))}
+            </div>
+            <p className="text-[13px] text-foreground leading-snug">
+              <strong>+10.000 tutores</strong> já transformaram seus cães
+            </p>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-[17px] font-bold leading-tight text-foreground">
+            Por que seu cão ignora você — mesmo depois de tanto tentar?
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            Descubra em 2 minutos o bloqueio instintivo que impede seu cão de obedecer e receba um plano personalizado para resolver isso.
           </p>
+
         </div>
+      </main>
 
-        <h1 className="text-[17px] font-bold leading-tight text-foreground">
-          Por que seu cão ignora você — mesmo depois de tanto tentar?
-        </h1>
-
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Descubra em 2 minutos o bloqueio instintivo que impede seu cão de obedecer e receba um plano personalizado para resolver isso.
-        </p>
-      </div>
-
-      {/* Barra/Botão — empurrados para baixo, estilo navy do quiz */}
-      <div className="px-5 pb-5 mt-auto pt-6">
+      {/* Footer fixo — barra/botão + badges */}
+      <footer className="quiz-footer">
         <div className="relative" style={{ height: "52px" }}>
-          {/* Barra de carregamento (navy do quiz) */}
+          {/* Barra */}
           <div
             className="absolute inset-0 overflow-hidden rounded-full"
             style={{
@@ -139,7 +157,7 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
             </div>
           </div>
 
-          {/* Botão CTA (mesmo estilo cta-primary do quiz) */}
+          {/* Botão CTA */}
           <button
             onClick={handleStart}
             className="absolute inset-0 rounded-full font-semibold text-primary-foreground"
@@ -156,7 +174,7 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
           </button>
         </div>
 
-        {/* Label de status */}
+        {/* Status */}
         <p
           className="mt-2 text-center text-[11px]"
           style={{
@@ -169,16 +187,23 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
         </p>
 
         {/* Badges */}
-        <p
-          className="mt-1 text-center text-[11px] text-muted-foreground"
+        <div
+          className="mt-1 flex justify-center gap-4"
           style={{
             opacity: ready ? 1 : 0,
             transition: "opacity 0.4s ease-in-out",
           }}
         >
-          ✓ Gratuito · ✓ Menos de 2 minutos
-        </p>
-      </div>
+          <div className="flex items-center gap-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="hsl(142,70%,38%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span className="text-[12px] text-muted-foreground">2 minutos</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="hsl(142,70%,38%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span className="text-[12px] text-muted-foreground">Plano personalizado</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
