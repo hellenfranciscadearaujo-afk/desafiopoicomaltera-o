@@ -37,7 +37,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
       <header className="quiz-header">
         <div className="flex items-center justify-between">
           <button
-            onClick={() => navigate("/quiz", { state: { ...s, step: 7 } as Record<string, unknown> })}
+            onClick={() => navigate("/quiz", { state: { ...s, step: 6 } as Record<string, unknown> })}
             className="flex h-9 w-9 items-center justify-center rounded-full text-foreground"
             aria-label="Voltar"
           >
@@ -101,7 +101,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
       <footer className="quiz-footer">
         <button
           className="cta-success"
-          onClick={() => navigate("/quiz", { state: { ...s, step: 8 } })}
+          onClick={() => navigate("/quiz", { state: { ...s, step: 7 } as Record<string, unknown> })}
         >
           Continuar
         </button>

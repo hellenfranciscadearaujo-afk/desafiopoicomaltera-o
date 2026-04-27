@@ -24,7 +24,7 @@ type Answers = {
 
 type NavigateFn = (to: string, opts?: { state?: Record<string, unknown>; replace?: boolean }) => void;
 
-const TOTAL = 9;
+const TOTAL = 8;
 
 const initial: Answers = {
   challenges: [],
@@ -125,116 +125,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
 
   const content = useMemo(() => {
     switch (step) {
-      // 1 — Welcome
+      // 1 — Challenges multi-select
       case 1:
         return (
-          <div className="quiz-shell">
-            {/* Header com logo e progress bar */}
-            <header className="quiz-header">
-              <div className="flex items-center justify-between">
-                <div className="h-9 w-9" />
-                <img src={logo} alt="DesafioPOI" className="h-5 w-auto" fetchPriority="high" />
-                <div className="h-9 w-9" />
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full" style={{ width: "11%", background: "var(--gradient-primary)" }} />
-              </div>
-            </header>
-
-            {/* Corpo com scroll */}
-            <main className="flex-1 overflow-y-auto px-5 pb-4">
-              <div className="flex flex-col gap-3 py-2">
-
-                {/* Cards Antes / Depois */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex flex-col items-center gap-1.5 overflow-hidden rounded-2xl border border-red-200 bg-red-50 pb-3">
-                    <div className="w-full overflow-hidden rounded-t-2xl">
-                      <img src={beforeImg} alt="Antes do POI" className="w-full h-auto block" loading="eager" fetchPriority="high" />
-                    </div>
-                    <p className="text-[12px] font-semibold text-center leading-tight px-2" style={{ color: "#7a1a1a" }}>Ignora os comandos</p>
-                    <span className="rounded-full px-3 py-0.5 text-[11px] font-bold" style={{ background: "#ffc5c5", color: "#7a1a1a" }}>Hoje</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1.5 overflow-hidden rounded-2xl border border-green-200 bg-green-50 pb-3">
-                    <div className="w-full overflow-hidden rounded-t-2xl">
-                      <img src={afterImg} alt="Depois do POI" className="w-full h-auto block" loading="eager" fetchPriority="high" />
-                    </div>
-                    <p className="text-[12px] font-semibold text-center leading-tight px-2" style={{ color: "#0d4d22" }}>Obedece em 7 min/dia</p>
-                    <span className="rounded-full px-3 py-0.5 text-[11px] font-bold" style={{ background: "#a8e6c0", color: "#0d4d22" }}>21 dias</span>
-                  </div>
-                </div>
-
-                {/* Prova social */}
-                <div className="flex items-center gap-2 rounded-xl border border-border bg-accent px-3 py-2.5">
-                  <div className="flex gap-0.5 flex-shrink-0">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#e8a400"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-                    ))}
-                  </div>
-                  <p className="text-[12px] text-foreground leading-snug">
-                    <strong>+10.000 tutores</strong> já transformaram seus cães
-                  </p>
-                </div>
-
-                {/* Headline */}
-                <h1 className="text-[17px] font-bold leading-tight text-foreground">
-                  Por que seu cão ignora você — mesmo depois de tanto tentar?
-                </h1>
-
-                {/* Subheadline */}
-                <p className="text-[13px] leading-relaxed text-muted-foreground">
-                  Descubra em 2 minutos o bloqueio instintivo que impede seu cão de obedecer e receba um plano personalizado para resolver isso.
-                </p>
-
-                {/* Lista "Você reconhece algum desses?" */}
-                <div className="overflow-hidden rounded-2xl border border-border">
-                  <div className="border-b border-border bg-muted px-3 py-2">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                      Você reconhece algum desses?
-                    </p>
-                  </div>
-                  {[
-                    "Chamou, ele olhou e ignorou completamente",
-                    "Já tentou petisco, gritar \"não\", punir — nada funcionou",
-                    "Puxa a guia, late pra visitas ou destrói coisas sozinho",
-                  ].map((item, i, arr) => (
-                    <div key={item} className={`flex items-start gap-2.5 px-3 py-2.5 ${i < arr.length - 1 ? "border-b border-border" : ""}`}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                        <circle cx="12" cy="12" r="10" fill="#fde8e8"/>
-                        <line x1="8" y1="8" x2="16" y2="16" stroke="#c0392b" strokeWidth="2.2" strokeLinecap="round"/>
-                        <line x1="16" y1="8" x2="8" y2="16" stroke="#c0392b" strokeWidth="2.2" strokeLinecap="round"/>
-                      </svg>
-                      <p className="text-[13px] leading-snug text-foreground">{item}</p>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </main>
-
-            {/* Footer com CTA e badges */}
-            <footer className="quiz-footer">
-              <button className="cta-primary" onClick={next}>
-                Começar Agora
-              </button>
-              <div className="mt-2 flex justify-center gap-4">
-                <div className="flex items-center gap-1">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="hsl(142,70%,38%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span className="text-[12px] text-muted-foreground">2 minutos</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="hsl(142,70%,38%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span className="text-[12px] text-muted-foreground">Plano personalizado</span>
-                </div>
-              </div>
-            </footer>
-          </div>
-        );
-
-      // 2 — Challenges multi-select
-      case 2:
-        return (
           <QuizShell
-            step={2}
+            step={1}
             totalSteps={TOTAL}
             onBack={back}
             headline="Qual o maior desafio com o comportamento do seu cão?"
@@ -281,11 +176,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 3 — Frustration / frequency
-      case 3:
+      // 2 — Frustration / frequency
+      case 2:
         return (
           <QuizShell
-            step={3}
+            step={2}
             totalSteps={TOTAL}
             onBack={back}
             headline="Entendemos sua frustração. Isso afeta mais do que você imagina!"
@@ -320,11 +215,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 4 — Instinct / ignored
-      case 4:
+      // 3 — Instinct / ignored
+      case 3:
         return (
           <QuizShell
-            step={4}
+            step={3}
             totalSteps={TOTAL}
             onBack={back}
             headline="E se a culpa não fosse sua, nem do seu cão?"
@@ -359,11 +254,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 5 — Age
-      case 5:
+      // 4 — Age
+      case 4:
         return (
           <QuizShell
-            step={5}
+            step={4}
             totalSteps={TOTAL}
             onBack={back}
             headline="Para um plano eficaz, precisamos conhecer seu parceiro de 4 patas!"
@@ -400,11 +295,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 6 — Breed + name
-      case 6:
+      // 5 — Breed + name
+      case 5:
         return (
           <QuizShell
-            step={6}
+            step={5}
             totalSteps={TOTAL}
             onBack={back}
             headline="Raça, nome e personalidade do seu cão."
@@ -457,19 +352,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 7 — Obedience level slider
-      case 7: {
-        const levels = [
-          { n: 1, e: "😤", label: "Difícil", desc: "quase não responde a comandos. Mas calma, tem solução!" },
-          { n: 2, e: "😅", label: "Agitado", desc: "obedece raramente, com muita insistência." },
-          { n: 3, e: "😐", label: "Regular", desc: "obedece alguns comandos, mas ainda tem momentos difíceis." },
-          { n: 4, e: "😊", label: "Obediente", desc: "vai bem na maioria das situações, com pequenos deslizes." },
-          { n: 5, e: "😇", label: "É um anjo!", desc: "obedece muito bem. Mas sempre dá pra evoluir ainda mais." },
-        ];
-        const selectedLevel = levels.find((l) => l.n === a.level);
+      // 6 — Obedience level slider
+      case 6: {
         return (
           <QuizShell
-            step={7}
+            step={6}
             totalSteps={TOTAL}
             onBack={back}
             headline={`Qual o nível de obediência do ${dogName} hoje?`}
@@ -500,34 +387,61 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
               Nível atual
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-3">
-              <div className="flex justify-between gap-1.5 mb-3">
-                {levels.map((lv) => {
-                  const sel = a.level === lv.n;
-                  return (
-                    <button
-                      key={lv.n}
-                      onClick={() => update("level", lv.n)}
-                      className="flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 px-1 transition-all"
-                      style={{
-                        background: sel ? "hsl(var(--accent))" : "hsl(var(--muted) / 0.4)",
-                        border: sel ? "1px solid hsl(var(--primary))" : "1px solid hsl(var(--border))",
-                        transform: sel ? "scale(1.06)" : "scale(1)",
-                      }}
-                    >
-                      <span className="text-[20px] leading-none">{lv.e}</span>
-                      <span className={`text-[11px] font-semibold ${sel ? "text-primary" : "text-muted-foreground"}`}>{lv.n}</span>
-                      <span className={`text-[9px] leading-tight text-center ${sel ? "text-primary/80" : "text-muted-foreground/70"}`}>{lv.label}</span>
-                    </button>
-                  );
-                })}
+            <div className="rounded-2xl border border-border bg-card p-5">
+              {/* Emojis das extremidades */}
+              <div className="mb-3 flex justify-between items-end">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-[28px] leading-none">😤</span>
+                  <span className="text-[11px] font-semibold text-muted-foreground">Desobediente</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-[28px] leading-none">😇</span>
+                  <span className="text-[11px] font-semibold text-muted-foreground">Anjo</span>
+                </div>
               </div>
-              <div className="rounded-lg bg-muted/40 px-3 py-2 text-center text-[12px] leading-relaxed text-foreground">
-                {selectedLevel ? (
-                  <><span className="font-bold">{selectedLevel.label}</span> — {selectedLevel.desc}</>
-                ) : (
-                  <span className="text-muted-foreground">Selecione o nível atual do seu cão</span>
-                )}
+
+              {/* Slider customizado */}
+              <div className="relative px-1 py-3">
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={a.level || 1}
+                  onChange={(e) => update("level", Number(e.target.value))}
+                  className="quiz-range w-full"
+                  style={{
+                    background: a.level
+                      ? `linear-gradient(to right, #6B4FD8 0%, #2B6CF0 ${((a.level - 1) / 4) * 100}%, #E3E6F0 ${((a.level - 1) / 4) * 100}%, #E3E6F0 100%)`
+                      : "#E3E6F0",
+                  }}
+                />
+              </div>
+
+              {/* Marcadores numéricos */}
+              <div className="flex justify-between px-1 mt-1">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => update("level", n)}
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold transition-all"
+                    style={{
+                      background: a.level === n
+                        ? "linear-gradient(135deg, #6B4FD8 0%, #2B6CF0 100%)"
+                        : a.level && a.level > n
+                          ? "hsl(var(--accent))"
+                          : "hsl(var(--muted))",
+                      color: a.level === n
+                        ? "#fff"
+                        : a.level && a.level > n
+                          ? "hsl(var(--primary))"
+                          : "hsl(var(--muted-foreground))",
+                      transform: a.level === n ? "scale(1.15)" : "scale(1)",
+                    }}
+                  >
+                    {n}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -541,8 +455,8 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
         );
       }
 
-      // 8 — Depoimentos
-      case 8:
+      // 7 — Depoimentos
+      case 7:
         return (
           <div className="quiz-shell">
             <header className="quiz-header">
@@ -554,7 +468,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
                 <div className="h-9 w-9" />
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full transition-all duration-500" style={{ width: "88%", background: "var(--gradient-primary)" }} />
+                <div className="h-full rounded-full transition-all duration-500" style={{ width: "87.5%", background: "var(--gradient-primary)" }} />
               </div>
             </header>
 
@@ -658,11 +572,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </div>
         );
 
-      // 9 — Email
-      case 9:
+      // 8 — Email
+      case 8:
         return (
           <QuizShell
-            step={9}
+            step={8}
             totalSteps={TOTAL}
             onBack={back}
             headline={`Receba o plano completo de ${dogName} no seu e-mail!`}
@@ -673,7 +587,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
                   className="cta-primary"
                   disabled={!/\S+@\S+\.\S+/.test(a.email)}
                   onClick={() =>
-                    navigate("/oferta", {
+                    navigate("/presente", {
                       state: {
                         dogName: a.dogName,
                         challenges: a.challenges,

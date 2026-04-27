@@ -1,14 +1,13 @@
 /**
  * App.tsx — SPA de URL única com rastreamento híbrido Meta (Pixel + CAPI)
  *
- * Fluxo de estados:
- * home → quiz (passos 1-9) → loading → diagnosis → offer
+ * Fluxo: home → quiz (passos 1-8) → loading → diagnosis → quiz(7-8) → gift → offer
  *
  * Eventos Meta:
  * - PageView    → ao montar o App (1x)
  * - QuizStart   → ao clicar no CTA da home (home → quiz)
  * - QuizProgress → ao chegar no diagnóstico
- * - Lead        → ao chegar na oferta
+ * - Lead        → ao clicar em "Receber meu presente" na página de presente
  */
 
 import { useEffect, useState } from "react";
@@ -22,9 +21,10 @@ import Home from "./pages/Home.tsx";
 import Index from "./pages/Index.tsx";
 import Loading from "./pages/Loading.tsx";
 import Diagnosis from "./pages/Diagnosis.tsx";
+import Gift from "./pages/Gift.tsx";
 import Offer from "./pages/Offer.tsx";
 
-export type FunnelStage = "home" | "quiz" | "loading" | "diagnosis" | "offer";
+export type FunnelStage = "home" | "quiz" | "loading" | "diagnosis" | "gift" | "offer";
 
 export interface QuizData {
   dogName?: string;
@@ -56,7 +56,7 @@ function FunnelOrchestrator() {
     setQuizData((prev) => ({ ...prev, ...data }));
 
     if (to === "/" || to === "/quiz") {
-      // Se saiu da home para o quiz (step 1), dispara QuizStart
+      // QuizStart só dispara quando sai da home pela primeira vez
       if (stage === "home") trackQuizStart();
       setStage("quiz");
     } else if (to === "/carregando") {
@@ -64,7 +64,11 @@ function FunnelOrchestrator() {
     } else if (to === "/diagnostico") {
       trackQuizProgress();
       setStage("diagnosis");
+    } else if (to === "/presente") {
+      setStage("gift");
     } else if (to === "/oferta") {
+      // Lead dispara aqui pois o navigate("/oferta") só é chamado pelo botão
+      // "Receber meu presente" da página Gift
       trackLead();
       setStage("offer");
     }
@@ -79,6 +83,8 @@ function FunnelOrchestrator() {
       return <Loading _navigate={navigate} _initialState={quizData} />;
     case "diagnosis":
       return <Diagnosis _navigate={navigate} _initialState={quizData} />;
+    case "gift":
+      return <Gift _navigate={navigate} _initialState={quizData} />;
     case "offer":
       return <Offer _initialState={quizData} />;
     default:
