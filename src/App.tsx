@@ -1,8 +1,5 @@
 /**
  * App.tsx — SPA com lazy loading agressivo
- *
- * Apenas a Home (+ providers mínimos) carrega no bundle inicial.
- * Tooltip, Toaster, QueryClient e demais páginas são lazy.
  */
 
 import { lazy, Suspense, useEffect, useState } from "react";
@@ -40,14 +37,19 @@ function FunnelOrchestrator() {
   const { trackPageView, trackQuizStart, trackQuizProgress, trackLead } = useMetaEvents();
 
   useEffect(() => {
+    console.log("App mounted, stage:", stage);
     trackPageView();
-    // Pré-carrega Index em background 1.5s depois (sem competir com first paint)
-    const t = setTimeout(() => { import("./pages/Index.tsx"); }, 1500);
+    // Pré-carrega Index em background 1.5s depois
+    const t = setTimeout(() => { 
+      console.log("Preloading Index...");
+      import("./pages/Index.tsx").catch(err => console.error("Preload error:", err)); 
+    }, 1500);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const navigate = (to: string, opts?: { state?: QuizData; replace?: boolean }) => {
+    console.log("Navigating to:", to, "with data:", opts?.state);
     const data = opts?.state ?? {};
     setQuizData((prev) => ({ ...prev, ...data }));
 
@@ -67,12 +69,14 @@ function FunnelOrchestrator() {
     }
   };
 
+  console.log("Rendering stage:", stage);
+
   if (stage === "home") {
     return <Home _navigate={navigate} />;
   }
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div style={{display:'flex', alignItems:'center', justifyContent:'center', height:'100vh'}}>Carregando...</div>}>
       <HeavyProviders>
         {stage === "quiz" && <Index _navigate={navigate} _initialState={quizData} />}
         {stage === "loading" && <Loading _navigate={navigate} _initialState={quizData} />}
