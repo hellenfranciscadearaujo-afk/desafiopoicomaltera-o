@@ -1,28 +1,24 @@
 /**
- * App.tsx — SPA de URL única com rastreamento híbrido Meta (Pixel + CAPI)
+ * App.tsx — SPA com lazy loading agressivo
  *
- * Fluxo: home → quiz (passos 1-8) → loading → diagnosis → quiz(7-8) → gift → offer
- *
- * Eventos Meta:
- * - PageView    → ao montar o App (1x)
- * - QuizStart   → ao clicar no CTA da home (home → quiz)
- * - QuizProgress → ao chegar no diagnóstico
- * - Lead        → ao clicar em "Receber meu presente" na página de presente
+ * Apenas a Home (+ providers mínimos) carrega no bundle inicial.
+ * Tooltip, Toaster, QueryClient e demais páginas são lazy.
  */
 
-import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useMetaEvents } from "@/hooks/useMetaEvents";
 
 import Home from "./pages/Home.tsx";
-import Index from "./pages/Index.tsx";
-import Loading from "./pages/Loading.tsx";
-import Diagnosis from "./pages/Diagnosis.tsx";
-import Gift from "./pages/Gift.tsx";
-import Offer from "./pages/Offer.tsx";
+
+// Lazy — só carrega após o usuário sair da Home
+const Index = lazy(() => import("./pages/Index.tsx"));
+const Loading = lazy(() => import("./pages/Loading.tsx"));
+const Diagnosis = lazy(() => import("./pages/Diagnosis.tsx"));
+const Gift = lazy(() => import("./pages/Gift.tsx"));
+const Offer = lazy(() => import("./pages/Offer.tsx"));
+
+// Providers pesados também lazy
+const HeavyProviders = lazy(() => import("./HeavyProviders.tsx"));
 
 export type FunnelStage = "home" | "quiz" | "loading" | "diagnosis" | "gift" | "offer";
 
@@ -38,16 +34,16 @@ export interface QuizData {
   step?: number;
 }
 
-const queryClient = new QueryClient();
-
 function FunnelOrchestrator() {
   const [stage, setStage] = useState<FunnelStage>("home");
   const [quizData, setQuizData] = useState<QuizData>({});
   const { trackPageView, trackQuizStart, trackQuizProgress, trackLead } = useMetaEvents();
 
-  // PageView 1x ao entrar
   useEffect(() => {
     trackPageView();
+    // Pré-carrega Index em background 1.5s depois (sem competir com first paint)
+    const t = setTimeout(() => { import("./pages/Index.tsx"); }, 1500);
+    return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,7 +52,6 @@ function FunnelOrchestrator() {
     setQuizData((prev) => ({ ...prev, ...data }));
 
     if (to === "/" || to === "/quiz") {
-      // QuizStart só dispara quando sai da home pela primeira vez
       if (stage === "home") trackQuizStart();
       setStage("quiz");
     } else if (to === "/carregando") {
@@ -67,39 +62,28 @@ function FunnelOrchestrator() {
     } else if (to === "/presente") {
       setStage("gift");
     } else if (to === "/oferta") {
-      // Lead dispara aqui pois o navigate("/oferta") só é chamado pelo botão
-      // "Receber meu presente" da página Gift
       trackLead();
       setStage("offer");
     }
   };
 
-  switch (stage) {
-    case "home":
-      return <Home _navigate={navigate} />;
-    case "quiz":
-      return <Index _navigate={navigate} _initialState={quizData} />;
-    case "loading":
-      return <Loading _navigate={navigate} _initialState={quizData} />;
-    case "diagnosis":
-      return <Diagnosis _navigate={navigate} _initialState={quizData} />;
-    case "gift":
-      return <Gift _navigate={navigate} _initialState={quizData} />;
-    case "offer":
-      return <Offer _initialState={quizData} />;
-    default:
-      return <Home _navigate={navigate} />;
+  if (stage === "home") {
+    return <Home _navigate={navigate} />;
   }
+
+  return (
+    <Suspense fallback={null}>
+      <HeavyProviders>
+        {stage === "quiz" && <Index _navigate={navigate} _initialState={quizData} />}
+        {stage === "loading" && <Loading _navigate={navigate} _initialState={quizData} />}
+        {stage === "diagnosis" && <Diagnosis _navigate={navigate} _initialState={quizData} />}
+        {stage === "gift" && <Gift _navigate={navigate} _initialState={quizData} />}
+        {stage === "offer" && <Offer _initialState={quizData} />}
+      </HeavyProviders>
+    </Suspense>
+  );
 }
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <FunnelOrchestrator />
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => <FunnelOrchestrator />;
 
 export default App;
