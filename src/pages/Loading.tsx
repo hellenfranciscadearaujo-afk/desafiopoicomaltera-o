@@ -37,15 +37,15 @@ const Loading = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _in
   ];
 
   useEffect(() => {
-    const total = 12000;
+    const total = 7000;
     const start = Date.now();
     const tick = setInterval(() => {
       const elapsed = Date.now() - start;
       const pct = Math.min(100, (elapsed / total) * 100);
       setProgress(pct);
-      if (elapsed < 3000) setMsgIndex(0);
-      else if (elapsed < 6000) setMsgIndex(1);
-      else if (elapsed < 9000) setMsgIndex(2);
+      if (elapsed < 1750) setMsgIndex(0);
+      else if (elapsed < 3500) setMsgIndex(1);
+      else if (elapsed < 5250) setMsgIndex(2);
       else setMsgIndex(3);
       if (elapsed >= total) {
         clearInterval(tick);

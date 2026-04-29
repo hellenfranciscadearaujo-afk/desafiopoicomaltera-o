@@ -24,7 +24,7 @@ type Answers = {
 
 type NavigateFn = (to: string, opts?: { state?: Record<string, unknown>; replace?: boolean }) => void;
 
-const TOTAL = 8;
+const TOTAL = 9;
 
 const initial: Answers = {
   challenges: [],
@@ -38,7 +38,7 @@ const initial: Answers = {
 };
 
 const QuizImage = ({ src, alt }: { src: string; alt: string }) => (
-  <div className="overflow-hidden w-full">
+  <div className="overflow-hidden w-full mx-auto" style={{ maxWidth: "240px" }}>
     <img
       src={src}
       alt={alt}
@@ -73,6 +73,65 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
 
   const dogName = a.dogName.trim() || "seu cão";
 
+  // Mapa de comportamentos para headlines/subheadlines dinâmicas (passo 2)
+  const challengeContent: Record<string, { h: string; s: string }> = {
+    "Morde mãos, pés ou objetos o tempo todo.": {
+      h: "Pelas suas respostas, seu cão está mordendo com frequência",
+      s: "Morder mãos, pés ou objetos não é só energia — é instinto mal direcionado. Quando ele não sabe onde descarregar isso, acaba mordendo tudo.",
+    },
+    "Destrói objetos em casa quando fica sozinho.": {
+      h: "Seu cão está destruindo coisas quando fica sozinho",
+      s: "Isso geralmente é ansiedade de separação — e sem direcionamento do instinto, ele tenta aliviar isso destruindo o que encontra.",
+    },
+    "Faz as necessidades no lugar errado.": {
+      h: "Seu cão ainda está fazendo no lugar errado",
+      s: "Isso não é teimosia — ele não associou corretamente o comportamento ao instinto natural de eliminação no lugar certo.",
+    },
+    "Late excessivamente para visitas ou outros cães.": {
+      h: "Seu cão está latindo excessivamente nessas situações",
+      s: "Esse tipo de reação vem do instinto de alerta mal direcionado — sem controle, qualquer estímulo vira motivo pra latir.",
+    },
+    "Ignora completamente quando eu chamo.": {
+      h: "Seu cão está te ignorando quando você chama",
+      s: "Isso acontece quando o comando não conversa com o instinto dele — então ele simplesmente não vê motivo pra responder.",
+    },
+    "Rosna ou demonstra agressividade.": {
+      h: "Seu cão já está demonstrando sinais de agressividade",
+      s: "Rosnar ou reagir geralmente é um instinto de defesa desregulado — sem direção, ele reage em vez de obedecer.",
+    },
+    "Não obedece comandos básicos.": {
+      h: "Seu cão ainda não obedece nem o básico",
+      s: "Sem ativar o instinto certo, o comando vira só um som — e o cão não entende por que deveria obedecer.",
+    },
+  };
+
+  // Calcula headline/subheadline da página de frustração baseado nas respostas
+  const frustrationContent = (() => {
+    const count = a.challenges.length;
+    if (count >= 3) {
+      return {
+        h: "Isso já virou um padrão de comportamento",
+        s: "Quando vários problemas aparecem ao mesmo tempo, seu cão não está reagindo por acaso — ele está seguindo um padrão sem controle.",
+      };
+    }
+    if (count === 2) {
+      return {
+        h: "Os problemas já estão começando a se acumular",
+        s: "Quando mais de um comportamento aparece, não é coincidência — é sinal de que o instinto do seu cão não está sendo direcionado da forma certa.",
+      };
+    }
+    if (count === 1) {
+      return challengeContent[a.challenges[0]] || {
+        h: "Entendemos sua frustração",
+        s: "Muitos tutores se sentem exatamente como você. Mas há uma solução.",
+      };
+    }
+    return {
+      h: "Entendemos sua frustração",
+      s: "Muitos tutores se sentem exatamente como você. Mas há uma solução.",
+    };
+  })();
+
   const breeds = [
     { e: "🐕", n: "Vira-Lata (SRD)" },
     { e: "🦴", n: "Labrador" },
@@ -100,14 +159,13 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
   ];
 
   const challenges = [
-    { e: "🚫", t: "Ele me ignora completamente quando o chamo." },
-    { e: "🐕‍🦺", t: "Puxa a guia sem parar durante os passeios." },
+    { e: "🦷", t: "Morde mãos, pés ou objetos o tempo todo." },
     { e: "🛋️", t: "Destrói objetos em casa quando fica sozinho." },
+    { e: "💧", t: "Faz as necessidades no lugar errado." },
     { e: "🔊", t: "Late excessivamente para visitas ou outros cães." },
-    { e: "💧", t: "Faz as necessidades no lugar errado, mesmo depois de treinado." },
-    { e: "😰", t: "Fica ansioso e agitado quando fico fora de casa." },
-    { e: "😡", t: "Rosna ou demonstra agressividade com pessoas ou outros animais." },
-    { e: "🙅", t: "Não obedece nem os comandos básicos como sentar ou ficar." },
+    { e: "🚫", t: "Ignora completamente quando eu chamo." },
+    { e: "😡", t: "Rosna ou demonstra agressividade." },
+    { e: "🙅", t: "Não obedece comandos básicos." },
   ];
 
   const frequencies = [
@@ -183,8 +241,8 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             step={2}
             totalSteps={TOTAL}
             onBack={back}
-            headline="Entendemos sua frustração. Isso afeta mais do que você imagina!"
-            subheadline="Muitos tutores se sentem exatamente como você. Mas há uma solução."
+            headline={frustrationContent.h}
+            subheadline={frustrationContent.s}
             image={<QuizImage src={quiz3} alt="Cão sentado recebendo recompensa" />}
             footer={
               <button className="cta-primary" disabled={!a.frequency} onClick={next}>
@@ -295,19 +353,19 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </QuizShell>
         );
 
-      // 5 — Breed + name
+      // 5 — Nome do cão
       case 5:
         return (
           <QuizShell
             step={5}
             totalSteps={TOTAL}
             onBack={back}
-            headline="Raça, nome e personalidade do seu cão."
-            subheadline="Esses detalhes ajudam a traçar o perfil ideal para o Protocolo POI."
+            headline="Qual o nome do seu cão?"
+            subheadline="Vamos personalizar o desafio com o nome do seu companheiro."
             footer={
               <button
                 className="cta-primary"
-                disabled={!a.breed || !a.dogName.trim()}
+                disabled={!a.dogName.trim()}
                 onClick={next}
               >
                 Continuar
@@ -315,11 +373,47 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             }
           >
             <div className="mb-2 inline-block self-start rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-              Perfil do cão
+              Nome
             </div>
-            <p className="px-1 pb-1 text-[14px] font-bold text-foreground">
-              Qual a raça do seu cão?
+            <input
+              type="text"
+              value={a.dogName}
+              onChange={(e) => update("dogName", e.target.value)}
+              placeholder="Ex: Rex, Luna, Mel..."
+              className="w-full rounded-2xl border border-border bg-card px-4 py-3 text-[15px] outline-none focus:border-primary focus:bg-accent"
+              autoFocus
+            />
+            <p className="px-1 pt-2 text-[12px] text-muted-foreground">
+              {a.dogName.trim()
+                ? <>O desafio será criado especialmente para <span className="font-bold text-primary">{a.dogName.trim()}</span>!</>
+                : "O desafio será personalizado para o seu cão."
+              }
             </p>
+          </QuizShell>
+        );
+
+      // 6 — Raça
+      case 6:
+        return (
+          <QuizShell
+            step={6}
+            totalSteps={TOTAL}
+            onBack={back}
+            headline={`Qual a raça do ${dogName}?`}
+            subheadline="Esses detalhes ajudam a traçar o perfil ideal para o Protocolo POI."
+            footer={
+              <button
+                className="cta-primary"
+                disabled={!a.breed}
+                onClick={next}
+              >
+                Continuar
+              </button>
+            }
+          >
+            <div className="mb-2 inline-block self-start rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+              Raça
+            </div>
             <div className="flex flex-wrap gap-2 pb-2">
               {breeds.map((b) => (
                 <button
@@ -332,31 +426,14 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
                 </button>
               ))}
             </div>
-            <div className="my-2 h-px bg-border" />
-            <p className="px-1 pb-1 pt-1 text-[14px] font-bold text-foreground">
-              Qual o nome do seu companheiro?
-            </p>
-            <input
-              type="text"
-              value={a.dogName}
-              onChange={(e) => update("dogName", e.target.value)}
-              placeholder="Ex: Rex, Luna, Mel..."
-              className="w-full rounded-2xl border border-border bg-card px-4 py-2.5 text-[14px] outline-none focus:border-primary focus:bg-accent"
-            />
-            <p className="px-1 pt-1.5 text-[12px] text-muted-foreground">
-              {a.dogName.trim()
-                ? <>O desafio será criado especialmente para <span className="font-bold text-primary">{a.dogName.trim()}</span>!</>
-                : "O desafio será personalizado para o seu cão."
-              }
-            </p>
           </QuizShell>
         );
 
-      // 6 — Obedience level slider
-      case 6: {
+      // 7 — Obedience level slider
+      case 7: {
         return (
           <QuizShell
-            step={6}
+            step={7}
             totalSteps={TOTAL}
             onBack={back}
             headline={`Qual o nível de obediência do ${dogName} hoje?`}
@@ -455,8 +532,8 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
         );
       }
 
-      // 7 — Depoimentos
-      case 7:
+      // 8 — Depoimentos
+      case 8:
         return (
           <div className="quiz-shell">
             <header className="quiz-header">
@@ -572,11 +649,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
           </div>
         );
 
-      // 8 — Email
-      case 8:
+      // 9 — Email
+      case 9:
         return (
           <QuizShell
-            step={8}
+            step={9}
             totalSteps={TOTAL}
             onBack={back}
             headline={`Receba o plano completo de ${dogName} no seu e-mail!`}

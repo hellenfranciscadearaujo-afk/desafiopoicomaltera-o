@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, ShieldCheck, Gift, Plus, Minus, Zap } from "lucide-react";
+import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3, CheckCircle2 } from "lucide-react";
 import beforeImg from "@/assets/before.webp";
 import afterImg from "@/assets/after.webp";
 
@@ -15,6 +15,9 @@ interface OfferState {
 const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const s = _initialState as OfferState;
   const dogName = s.dogName?.trim() || "seu cão";
+  // Cupom igual ao da página Gift: POI68 + 4 primeiras letras do nome
+  const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
+  const coupon = `POI68${couponSuffix}`;
   const breed = s.breed || "—";
   const age = s.age || "—";
   const level = s.level || 3;
@@ -43,25 +46,141 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
   return (
     <div className="mx-auto min-h-dvh max-w-md bg-secondary">
-      {/* Urgência */}
-      <div className="bg-primary px-4 py-2.5 text-center text-primary-foreground">
-        <div className="flex items-center justify-center gap-1.5 text-[14px] font-bold uppercase tracking-widest">
-          <Zap className="h-4 w-4" /> Oferta por tempo limitado
-        </div>
-        <div className="mt-1 flex items-center justify-center gap-2">
-          <span className="text-[14px] opacity-90">Seu desconto expira em:</span>
-          <span className="text-xl font-extrabold tracking-wide tabular-nums">{mm}:{ss}</span>
+      {/* Urgência — timer fino com azul mais claro */}
+      <div
+        className="px-4 py-1.5 text-center"
+        style={{
+          background: "linear-gradient(90deg, hsl(218,80%,42%) 0%, hsl(216,85%,52%) 100%)",
+          color: "#fff",
+        }}
+      >
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <span className="flex items-center gap-1 text-[12px] font-bold uppercase tracking-wider">
+            <Zap className="h-3.5 w-3.5" /> Oferta por tempo limitado
+          </span>
+          <span className="text-white/30">·</span>
+          <span className="text-[12px] opacity-95">Expira em</span>
+          <span
+            className="rounded-md px-2 py-0.5 text-[13px] font-extrabold tracking-wide tabular-nums"
+            style={{ background: "rgba(255,255,255,0.18)" }}
+          >
+            {mm}:{ss}
+          </span>
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero — Parabéns + Presente resgatado */}
       <Section>
-        <h1 className="text-center text-[21px] font-extrabold leading-tight text-foreground">
-          O diagnóstico de {dogName} está pronto!
-        </h1>
-        <p className="mt-2 text-center text-[14px] leading-relaxed text-muted-foreground">
-          O Protocolo POI é o caminho mais rápido para transformar {dogName} em um companheiro exemplar.
-        </p>
+        <div className="grid grid-cols-[1.4fr_1fr] gap-3 items-center">
+          {/* Coluna esquerda: parabéns */}
+          <div>
+            <div className="flex items-start gap-2 mb-1.5">
+              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(142,70%,38%)" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h1 className="text-[19px] font-extrabold leading-tight text-foreground">
+                Parabéns, {dogName}!
+              </h1>
+            </div>
+            <h2 className="text-[18px] font-extrabold leading-tight text-foreground mb-2">
+              Seu desafio está pronto
+            </h2>
+            <p className="text-[12px] leading-relaxed text-muted-foreground">
+              Com base nas suas respostas, criamos um plano personalizado para transformar o {dogName}.
+            </p>
+          </div>
+
+          {/* Coluna direita: presente resgatado */}
+          <div className="flex flex-col items-center text-center">
+            {/* Mini-presente igual ao da página Gift */}
+            <div className="relative" style={{ width: "84px", height: "84px" }}>
+              {/* Sparkles */}
+              {[
+                { top: "-4px", left: "12%" },
+                { top: "20%", right: "-6px" },
+                { bottom: "10%", left: "-5px" },
+                { bottom: "-2px", right: "20%" },
+              ].map((p, i) => (
+                <span
+                  key={i}
+                  className="absolute"
+                  style={{ ...p, fontSize: "11px", animation: `sparkle 1.6s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
+                >✨</span>
+              ))}
+              <div className="relative h-full w-full" style={{ filter: "drop-shadow(0 6px 12px rgba(43,108,240,0.35))" }}>
+                {/* Corpo */}
+                <div className="absolute" style={{
+                  background: "linear-gradient(135deg, hsl(220,70%,22%) 0%, hsl(218,80%,38%) 100%)",
+                  boxShadow: "inset 0 -4px 8px rgba(0,0,0,0.18), inset 0 2px 4px rgba(255,255,255,0.1)",
+                  top: "30%", left: 0, right: 0, bottom: 0, borderRadius: "6px",
+                }} />
+                {/* Tampa */}
+                <div className="absolute" style={{
+                  background: "linear-gradient(135deg, hsl(218,75%,32%) 0%, hsl(216,85%,48%) 100%)",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15), inset 0 -2px 3px rgba(0,0,0,0.1)",
+                  top: "20%", left: "-3%", right: "-3%", height: "16%", borderRadius: "5px",
+                }} />
+                {/* Faixa vertical gold */}
+                <div className="absolute" style={{
+                  background: "linear-gradient(90deg, #FFB800 0%, #FFDF40 50%, #FFB800 100%)",
+                  width: "16%", left: "42%", top: "20%", bottom: 0,
+                  boxShadow: "inset -1px 0 2px rgba(0,0,0,0.2)",
+                }} />
+                {/* Faixa horizontal gold */}
+                <div className="absolute" style={{
+                  background: "linear-gradient(180deg, #FFB800 0%, #FFDF40 50%, #FFB800 100%)",
+                  height: "8%", left: 0, right: 0, top: "30%",
+                  boxShadow: "inset 0 -1px 2px rgba(0,0,0,0.18)",
+                }} />
+                {/* Laço */}
+                <div className="absolute" style={{ top: "0%", left: "50%", transform: "translateX(-50%)", width: "60%", height: "32%" }}>
+                  <div className="absolute" style={{
+                    background: "linear-gradient(135deg, #FFDF40 0%, #FFB800 100%)",
+                    width: "42%", height: "75%", left: 0, top: "12%",
+                    borderRadius: "50% 20% 20% 50%",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.18), inset 0 -1px 2px rgba(0,0,0,0.1)",
+                    transform: "rotate(-8deg)",
+                  }} />
+                  <div className="absolute" style={{
+                    background: "linear-gradient(225deg, #FFDF40 0%, #FFB800 100%)",
+                    width: "42%", height: "75%", right: 0, top: "12%",
+                    borderRadius: "20% 50% 50% 20%",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.18), inset 0 -1px 2px rgba(0,0,0,0.1)",
+                    transform: "rotate(8deg)",
+                  }} />
+                  <div className="absolute rounded-full" style={{
+                    background: "linear-gradient(135deg, #E69E00 0%, #FFB800 100%)",
+                    width: "26%", height: "32%", left: "37%", top: "35%",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.25), inset -1px -1px 1px rgba(0,0,0,0.15)",
+                  }} />
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[10px] mt-1.5 leading-tight text-muted-foreground">
+              Você resgatou seu
+            </p>
+            <p className="text-[12px] font-extrabold leading-tight text-foreground tracking-wide">
+              PRESENTE EXCLUSIVO!
+            </p>
+            <div className="mt-1 rounded-md border border-dashed border-primary px-1.5 py-0.5">
+              <p className="text-[10px] font-extrabold tracking-widest text-primary">{coupon}</p>
+            </div>
+            <p className="text-[10px] mt-1.5 leading-tight text-muted-foreground">
+              Acesso completo ao
+            </p>
+            <p className="text-[12px] font-bold leading-tight text-foreground">
+              <span className="text-foreground">Desafio</span><span className="text-primary">POI</span>
+            </p>
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes sparkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+            50%      { opacity: 1;   transform: scale(1.2) rotate(180deg); }
+          }
+        `}</style>
       </Section>
 
       {/* Antes / Depois */}
@@ -74,35 +193,88 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
         <BarRow label="Com o POI" value="5/5" tone="good" pct={100} />
       </Section>
 
-      {/* Resumo do diagnóstico */}
+      {/* Resumo do diagnóstico — espelha a página de Diagnóstico (compacto) */}
       <Section>
-        <p className="mb-3 text-[14px] font-bold uppercase tracking-widest text-muted-foreground">
-          Resumo do diagnóstico
-        </p>
-        <DRow k="Objetivo" v={goal} />
-        <DRow k="Raça" v={breed} />
-        <DRow k="Idade" v={age} />
-        <DRow k="Personalidade" v="Perfil Único POI" hot />
-        <div className="flex items-center justify-between py-2">
-          <span className="text-[14px] text-muted-foreground">Nível atual</span>
-          <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <span
-                key={i}
-                className={`h-2.5 w-2.5 rounded-full ${i <= level ? "bg-primary" : "bg-muted"}`}
+        <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            📋 Resumo do diagnóstico
+          </p>
+
+          {/* Linha 1: Raça + Idade + Nível X/5 */}
+          <div className="grid grid-cols-3 gap-2 mb-2.5">
+            <div className="flex items-center gap-1.5">
+              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent">
+                <PawPrint className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground leading-none">Raça</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight truncate">{breed}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 border-l border-border pl-2">
+              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground leading-none">Idade</p>
+                <p className="text-[11px] font-bold text-foreground leading-tight truncate">{age}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 border-l border-border pl-2">
+              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent">
+                <BarChart3 className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] text-muted-foreground leading-none">Nível</p>
+                <p className="text-[11px] font-bold text-primary leading-tight">{level}/5</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Linha 2: Bolinhas */}
+          <div className="flex items-center gap-1.5 mb-2.5 px-1">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div
+                key={n}
+                className="h-2 flex-1 rounded-full"
+                style={{
+                  background: n <= level ? "hsl(218,80%,42%)" : "hsl(var(--muted))",
+                }}
               />
             ))}
+          </div>
+
+          {/* Linha 3: Análise (3 bullets compactos) */}
+          <div className="border-t border-border pt-2">
+            <p className="text-[10px] font-bold text-muted-foreground mb-1.5">Padrão identificado:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(() => {
+                const items: string[] = ["Baixa consistência"];
+                const ch = s.challenges || [];
+                const hasAnxiety = ch.some((c) => c.includes("Destrói") || c.includes("Morde"));
+                const hasIgnore = ch.some((c) => c.includes("Ignora") || c.includes("Não obedece"));
+                if (hasAnxiety) items.push("Ansiedade com estímulos");
+                if (hasIgnore) items.push("Dependência do tutor");
+                if (!hasAnxiety && !hasIgnore) items.push("Reatividade a estímulos");
+                items.push("Falta de rotina estruturada");
+                return items.slice(0, 3).map((it, i) => (
+                  <div
+                    key={i}
+                    className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5"
+                  >
+                    <CheckCircle2 className="h-2.5 w-2.5" style={{ color: "hsl(142,70%,38%)" }} />
+                    <span className="text-[10px] font-medium text-foreground">{it}</span>
+                  </div>
+                ));
+              })()}
+            </div>
           </div>
         </div>
       </Section>
 
-      {/* Preço + CTA */}
+      {/* Preço + CTA (card laranja unificado) */}
       <Section>
-        <PriceBlock />
-        <CTA label={ctaLabel} />
-        <p className="mb-3 text-center text-[14px] text-muted-foreground">
-          Acesso imediato após o pagamento
-        </p>
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
         <Guarantee />
       </Section>
 
@@ -145,19 +317,9 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
         </div>
       </Section>
 
-      {/* Preço 2 */}
+      {/* Preço 2 (card laranja unificado) */}
       <Section>
-        <div className="mb-3 text-center">
-          <p className="text-[14px] font-medium text-muted-foreground line-through">De R$ 118,00</p>
-          <p className="text-[28px] font-extrabold leading-none text-success">R$ 37,00</p>
-          <p className="mt-1 text-[14px] text-muted-foreground">
-            Pagamento único · Acesso vitalício
-          </p>
-        </div>
-        <CTA label={ctaLabel} />
-        <p className="mb-3 text-center text-[14px] text-muted-foreground">
-          Acesso imediato após o pagamento
-        </p>
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
         <Guarantee />
       </Section>
 
@@ -253,23 +415,107 @@ const DRow = ({ k, v, hot }: { k: string; v: string; hot?: boolean }) => (
   </div>
 );
 
+const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; coupon: string; mm: string; ss: string; dogName: string }) => (
+  <div
+    className="mb-3 overflow-hidden rounded-2xl border-2"
+    style={{
+      borderColor: "#F59E0B",
+      background: "linear-gradient(180deg, #FFF4E6 0%, #FFEED5 100%)",
+      boxShadow: "0 8px 24px rgba(245,158,11,0.18)",
+    }}
+  >
+    {/* Topo — timer + cupom + 68% */}
+    <div
+      className="flex items-center justify-center gap-1.5 px-3 py-2 text-white text-[12px] font-extrabold flex-wrap"
+      style={{
+        background: "linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)",
+      }}
+    >
+      <span>🔥</span>
+      <span className="tabular-nums">{mm}:{ss}</span>
+      <span style={{ opacity: 0.7 }}>·</span>
+      <span className="tracking-widest">{coupon}</span>
+      <span style={{ opacity: 0.7 }}>·</span>
+      <span>68% DE DESCONTO</span>
+    </div>
+
+    {/* Corpo — 2 colunas (preço) + selo 68% OFF */}
+    <div className="relative px-4 pt-4 pb-3">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="text-center">
+          <p className="text-[12px] font-medium text-muted-foreground mb-1">De:</p>
+          <p className="text-[18px] font-bold text-muted-foreground line-through">R$ 118,00</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[12px] font-medium text-muted-foreground mb-1">Por apenas:</p>
+          <p className="text-[24px] font-extrabold leading-none" style={{ color: "hsl(142,70%,38%)" }}>
+            R$ 37,90
+          </p>
+        </div>
+      </div>
+
+      {/* Selo 68% OFF circular */}
+      <div
+        className="absolute flex h-14 w-14 items-center justify-center rounded-full text-white text-[11px] font-extrabold leading-tight text-center"
+        style={{
+          background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+          boxShadow: "0 4px 12px rgba(239,68,68,0.4)",
+          top: "8px",
+          right: "8px",
+          transform: "rotate(8deg)",
+        }}
+      >
+        68%<br />OFF
+      </div>
+
+      {/* CTA dentro do card */}
+      <a
+        href="https://pay.desafiopoi21days.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
+        className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline"
+        style={{
+          background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
+          boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
+        }}
+      >
+        {ctaLabel}
+      </a>
+    </div>
+
+    {/* Selos */}
+    <div className="flex items-center justify-around border-t border-orange-200 px-2 py-2.5 text-[10px] text-muted-foreground">
+      <div className="flex items-center gap-1">
+        <ShieldCheck className="h-3 w-3" style={{ color: "hsl(142,70%,38%)" }} />
+        <span>Compra 100% segura</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Check className="h-3 w-3" style={{ color: "hsl(142,70%,38%)" }} />
+        <span>Privacidade protegida</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Zap className="h-3 w-3" style={{ color: "hsl(142,70%,38%)" }} />
+        <span>Acesso imediato</span>
+      </div>
+    </div>
+  </div>
+);
+
 const PriceBlock = () => (
   <div className="mb-3 rounded-2xl border border-border bg-muted/20 p-4 text-center">
     <p className="mb-1 text-[14px] font-bold uppercase tracking-widest text-muted-foreground">
       Oferta especial de hoje
     </p>
     <p className="text-[14px] font-medium text-muted-foreground line-through">De R$ 118,00</p>
-    <p className="my-1 text-[32px] font-extrabold leading-none text-success">R$ 37,00</p>
+    <p className="my-1 text-[32px] font-extrabold leading-none text-success">R$ 37,90</p>
     <p className="text-[14px] text-muted-foreground">Pagamento único · Acesso vitalício</p>
     <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-[14px] font-bold text-success">
-      <Check className="h-3.5 w-3.5" /> Economia de R$ 81 — 68% off
+      <Check className="h-3.5 w-3.5" /> Economia de R$ 80 — 68% off
     </span>
   </div>
 );
 
 const CTA = ({ label }: { label: string }) => (
   <a
-    href="https://ggcheckout.app/checkout/v4/JJu2MWXXZXKnPDHywq3d"
+    href="https://pay.desafiopoi21days.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
     className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline"
   >{label}</a>
 );

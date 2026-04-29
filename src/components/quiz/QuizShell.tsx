@@ -30,19 +30,19 @@ export const QuizShell = ({
   return (
     <div className="quiz-shell">
       <header className="quiz-header">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-1.5">
           <button
             onClick={onBack}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-foreground disabled:opacity-30"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-foreground disabled:opacity-30"
             disabled={!showBack || !onBack}
             aria-label="Voltar"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <img src={logo} alt="DesafioPOI" className="h-5 w-auto" />
-          <div className="h-9 w-9" />
+          <img src={logo} alt="DesafioPOI" className="h-4 w-auto" />
+          <div className="h-7 w-7" />
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ width: `${progress}%`, background: "var(--gradient-primary)" }}

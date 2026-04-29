@@ -1,7 +1,13 @@
 /**
  * Home.tsx — Splash inicial antes do quiz
  *
- * Design compacto para caber tudo above-fold no mobile (sem scroll).
+ * Nova estrutura:
+ * 1. Logo (pequena)
+ * 2. Barra de progresso (próxima da logo)
+ * 3. Headline
+ * 4. Subheadline
+ * 5. Animação (slideshow GRANDE)
+ * 6. Botão CTA / Barra de carregamento (FIXO no rodapé)
  *
  * Pixel: QuizStart dispara no clique do botão (via App.tsx).
  */
@@ -50,10 +56,10 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
 
   return (
     <div className="flex h-screen flex-col bg-background overflow-hidden">
-      {/* Header — logo + barra azul */}
+      {/* Header — logo pequena + barra próxima */}
       <header className="px-5 pt-3 pb-2 flex-shrink-0">
-        <div className="flex items-center justify-center mb-2">
-          <img src={logo} alt="DesafioPOI" className="h-5 w-auto" />
+        <div className="flex items-center justify-center mb-1.5">
+          <img src={logo} alt="DesafioPOI" className="h-4 w-auto" />
         </div>
         <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
           <div
@@ -63,14 +69,23 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
         </div>
       </header>
 
-      {/* Body compacto */}
-      <main className="flex-1 flex flex-col px-5 gap-2 min-h-0">
+      {/* Body */}
+      <main className="flex-1 flex flex-col px-5 min-h-0">
+        {/* Headline */}
+        <h1 className="text-[18px] font-bold leading-tight text-foreground text-center mt-4">
+          Receba um desafio de obediência personalizado para o seu cão
+        </h1>
 
-        {/* Slideshow compacto */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-card p-2 shadow-sm flex-shrink-0">
+        {/* Subheadline */}
+        <p className="text-[13px] leading-relaxed text-muted-foreground text-center mt-2">
+          Responda a um questionário de 2 minutos e receba um desafio personalizado com base no objetivo, padrões comportamentais, idade e raça.
+        </p>
+
+        {/* Slideshow GRANDE — ocupa o espaço restante */}
+        <div className="flex-1 flex items-center justify-center mt-3">
           <div
-            className="relative mx-auto w-full"
-            style={{ maxWidth: "180px", aspectRatio: "1 / 1" }}
+            className="relative w-full"
+            style={{ maxWidth: "320px", aspectRatio: "1 / 1" }}
           >
             {slides.map((src, i) => (
               <img
@@ -89,34 +104,9 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
             ))}
           </div>
         </div>
-
-        {/* Prova social */}
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-accent px-3 py-2 flex-shrink-0">
-          <div className="flex gap-0.5 flex-shrink-0">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill="#e8a400">
-                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-              </svg>
-            ))}
-          </div>
-          <p className="text-[12px] text-foreground leading-snug">
-            <strong>+10.000 tutores</strong> já transformaram seus cães
-          </p>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-[16px] font-bold leading-tight text-foreground">
-          Por que seu cão ignora você — mesmo depois de tanto tentar?
-        </h1>
-
-        {/* Subheadline */}
-        <p className="text-[12px] leading-snug text-muted-foreground">
-          Descubra em 2 minutos o bloqueio instintivo que impede seu cão de obedecer e receba um plano personalizado.
-        </p>
-
       </main>
 
-      {/* Footer — barra/botão */}
+      {/* Footer FIXO — barra/botão antes da dobra */}
       <footer className="px-5 pb-3 pt-2 flex-shrink-0">
         <div className="relative" style={{ height: "48px" }}>
           {/* Barra */}
@@ -165,7 +155,6 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
           </button>
         </div>
 
-        {/* Status */}
         <p
           className="mt-1.5 text-center text-[10px]"
           style={{
@@ -177,7 +166,6 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
           {ready ? "Pronto! Vamos começar 🐾" : "A carregar o questionário..."}
         </p>
 
-        {/* Badges */}
         <div
           className="mt-0.5 flex justify-center gap-3"
           style={{
