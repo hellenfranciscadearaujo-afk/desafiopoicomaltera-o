@@ -1,20 +1,14 @@
 /**
  * Diagnosis.tsx — Diagnóstico comportamental personalizado
  *
- * Estrutura:
- * 1. Header com logo + barra de progresso
- * 2. Headline + subheadline (com nome do cão)
- * 3. Card "Perfil identificado" — Raça + Idade
- * 4. Card "Nível atual" — bolinhas + label + sintomas (do passo 1)
- * 5. Card "Análise do comportamento" — 4 bullets verdes (dinâmicos)
- * 6. Card "Evolução em 21 Dias" — gráfico com 3 marcos
- * 7. Card "Boa notícia!" — copy + badge +12.000 cães
- * 8. Footer fixo: botão CTA verde
+ * Header e footer FIXOS via position:fixed (mesma lógica do QuizShell).
+ * Body rola entre eles, mas logo/barra/CTA ficam travados.
  */
 
-import { useMemo } from "react";
-import { ChevronLeft, User, PawPrint, Calendar, BarChart3, AlertTriangle, Search, TrendingUp, Shield, CheckCircle2, Lock } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { ChevronLeft, User, PawPrint, Calendar, BarChart3, Search, TrendingUp, Shield, CheckCircle2, Lock } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { HighlightInstinto } from "@/components/HighlightInstinto";
 
 interface DiagState {
   dogName?: string;
@@ -29,15 +23,36 @@ interface DiagState {
 
 type NavigateFn = (to: string, opts?: { state?: Record<string, unknown>; replace?: boolean }) => void;
 
-// Mapa challenges → sintoma curto para o card "Nível atual"
-const challengeSymptom: Record<string, string> = {
-  "Morde mãos, pés ou objetos o tempo todo.": "Mordidas frequentes",
-  "Destrói objetos em casa quando fica sozinho.": "Ansiedade quando sozinho",
-  "Faz as necessidades no lugar errado.": "Eliminação fora do lugar",
-  "Late excessivamente para visitas ou outros cães.": "Reage antes de obedecer",
-  "Ignora completamente quando eu chamo.": "Ignora comandos em distrações",
-  "Rosna ou demonstra agressividade.": "Reatividade desregulada",
-  "Não obedece comandos básicos.": "Dificuldade em manter foco",
+// Mapa challenge → Objetivo (com título e descrição)
+const challengeToGoal: Record<string, { title: string; desc: string }> = {
+  "Ignora completamente quando eu chamo.": {
+    title: "Atenção e Comandos Básicos",
+    desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+  },
+  "Não obedece comandos básicos.": {
+    title: "Atenção e Comandos Básicos",
+    desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+  },
+  "Late excessivamente para visitas ou outros cães.": {
+    title: "Modulação de Reatividade",
+    desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+  },
+  "Rosna ou demonstra agressividade.": {
+    title: "Modulação de Reatividade",
+    desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+  },
+  "Destrói objetos em casa quando fica sozinho.": {
+    title: "Ansiedade e Comportamento em Casa",
+    desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+  },
+  "Morde mãos, pés ou objetos o tempo todo.": {
+    title: "Ansiedade e Comportamento em Casa",
+    desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+  },
+  "Faz as necessidades no lugar errado.": {
+    title: "Treino de Higiene",
+    desc: "Ensinar o local correto e criar consistência no comportamento.",
+  },
 };
 
 const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initialState?: DiagState }) => {
@@ -49,51 +64,78 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
   const age = s.age || "—";
   const challenges = s.challenges || [];
 
-  // Label e subtexto do nível atual (1 a 5)
-  const levelInfo = useMemo(() => {
-    switch (level) {
-      case 1: return { label: "Crítico", desc: "Seu cão ainda não responde aos comandos básicos." };
-      case 2: return { label: "Aprendiz", desc: "Seu cão está começando, mas precisa de mais consistência." };
-      case 3: return { label: "Intermediário com falhas", desc: "Seu cão já entende alguns estímulos, mas ainda apresenta dificuldades em momentos importantes." };
-      case 4: return { label: "Bom comportamento", desc: "Seu cão obedece bem, com alguns deslizes pontuais." };
-      case 5: return { label: "Excelente", desc: "Seu cão tem ótimo desempenho — vamos refinar ainda mais." };
-      default: return { label: "Intermediário", desc: "Seu cão precisa de um plano estruturado para evoluir." };
-    }
-  }, [level]);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const footerRef = useRef<HTMLElement | null>(null);
 
-  // Sintomas (3 primeiros challenges marcados)
-  const symptoms = useMemo(() => {
-    const list = challenges
-      .map((c) => challengeSymptom[c])
-      .filter(Boolean)
-      .slice(0, 3);
-    if (list.length === 0) return ["Baixa consistência", "Falta de foco", "Reação a estímulos"];
-    return list;
-  }, [challenges]);
+  // Mede header/footer
+  useEffect(() => {
+    const update = () => {
+      if (headerRef.current) {
+        document.documentElement.style.setProperty(
+          "--quiz-header-h",
+          `${headerRef.current.offsetHeight}px`
+        );
+      }
+      if (footerRef.current) {
+        document.documentElement.style.setProperty(
+          "--quiz-footer-h",
+          `${footerRef.current.offsetHeight}px`
+        );
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    if (headerRef.current) ro.observe(headerRef.current);
+    if (footerRef.current) ro.observe(footerRef.current);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
-  // Análise do comportamento — 4 bullets dinâmicos
-  const analysis = useMemo(() => {
-    const items: string[] = ["Baixa consistência nos comandos"];
-    const hasAnxiety = challenges.some((c) =>
-      c.includes("Destrói") || c.includes("Morde")
-    );
-    const hasIgnore = challenges.some((c) =>
-      c.includes("Ignora") || c.includes("Não obedece")
-    );
-    if (hasAnxiety) items.push("Ansiedade em ambientes com estímulos");
-    if (hasIgnore) items.push("Dependência emocional do tutor");
-    if (!hasAnxiety && !hasIgnore) {
-      items.push("Reatividade a estímulos do ambiente");
-      items.push("Falta de direcionamento do instinto");
+  // Objetivo dinâmico:
+  // 1 resposta → mostra o título + descrição daquele comportamento
+  // 2+ respostas → "Seu plano vai corrigir: X, Y e Z" + subheadline padrão
+  const goalContent = useMemo(() => {
+    if (challenges.length === 0) {
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
     }
-    items.push("Dificuldade em seguir rotina estruturada");
-    return items.slice(0, 4);
+    if (challenges.length === 1) {
+      const g = challengeToGoal[challenges[0]];
+      if (g) return { h: g.title, s: g.desc };
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
+    }
+    // 2+ respostas: lista resumo dos comportamentos
+    const map: Record<string, string> = {
+      "Morde mãos, pés ou objetos o tempo todo.": "morder",
+      "Destrói objetos em casa quando fica sozinho.": "destruir",
+      "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
+      "Late excessivamente para visitas ou outros cães.": "latir",
+      "Ignora completamente quando eu chamo.": "ignorar comandos",
+      "Rosna ou demonstra agressividade.": "agressividade",
+      "Não obedece comandos básicos.": "não obedecer",
+    };
+    const items = challenges.map((c) => map[c]).filter(Boolean);
+    let listStr = "";
+    if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
+    else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
+    return {
+      h: `Seu plano vai corrigir: ${listStr}`,
+      s: "O desafio vai reorganizar o instinto do seu cão, criando controle e respostas consistentes em todas essas situações.",
+    };
   }, [challenges]);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
-      {/* Header */}
-      <header className="flex flex-col gap-1.5 px-5 pt-3 pb-2 flex-shrink-0">
+    <div className="quiz-shell">
+      {/* Header fixo */}
+      <header className="quiz-header" ref={headerRef}>
         <div className="flex items-center justify-between mb-1.5">
           <button
             onClick={() => navigate("/quiz", { state: { ...s, step: 7 } as Record<string, unknown> })}
@@ -110,13 +152,12 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
         </div>
       </header>
 
-      {/* Body com scroll */}
-      <main className="flex-1 overflow-y-auto px-5 pb-3 pt-2">
-        {/* Headline */}
+      {/* Body */}
+      <main className="quiz-body">
         <h1 className="text-center text-[20px] font-extrabold leading-tight text-foreground">
           Diagnóstico comportamental do <span className="text-primary">{dogName}</span>
         </h1>
-        <p className="mt-1.5 text-center text-[12px] leading-relaxed text-muted-foreground">
+        <p className="mt-2 text-center text-[13px] leading-relaxed text-muted-foreground">
           Com base nas suas respostas, analisamos o perfil do seu cão para criar o melhor plano de treino.
         </p>
 
@@ -148,18 +189,22 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
           </div>
         </div>
 
-        {/* Card 2 - Nível atual */}
+        {/* Card 2 - Nível atual (simplificado) */}
         <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" />
-              <h2 className="text-[14px] font-bold text-foreground">Nível atual</h2>
-            </div>
-            <div className="flex gap-1.5">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            <h2 className="text-[14px] font-bold text-foreground">Nível atual</h2>
+          </div>
+
+          <div className="flex items-center justify-center gap-4">
+            <p className="text-[36px] font-extrabold leading-none text-primary">
+              {level}/5
+            </p>
+            <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((n) => (
                 <div
                   key={n}
-                  className="h-3 w-3 rounded-full"
+                  className="h-4 w-4 rounded-full"
                   style={{
                     background: n <= level ? "hsl(218,80%,42%)" : "hsl(var(--muted))",
                   }}
@@ -167,53 +212,20 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
               ))}
             </div>
           </div>
-
-          <div className="grid grid-cols-[auto_1fr] gap-3 items-start">
-            <div className="flex flex-col">
-              <p className="text-[28px] font-extrabold leading-none text-primary">
-                {level}/5
-              </p>
-              <p className="text-[13px] font-bold text-foreground mt-1.5 leading-tight">
-                {levelInfo.label}
-              </p>
-              <p className="text-[11px] text-muted-foreground leading-snug mt-1">
-                {levelInfo.desc}
-              </p>
-            </div>
-
-            <div className="rounded-xl bg-accent p-2.5">
-              <div className="flex items-start gap-1.5 mb-1">
-                <AlertTriangle className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
-              </div>
-              <ul className="space-y-1">
-                {symptoms.map((sym, i) => (
-                  <li key={i} className="flex items-start gap-1.5 text-[11px] leading-snug text-foreground">
-                    <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-foreground" />
-                    <span>{sym}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
         </div>
 
-        {/* Card 3 - Análise do comportamento */}
+        {/* Card 3 - Objetivo (substitui Análise) */}
         <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <Search className="h-4 w-4 text-primary" />
-            <h2 className="text-[14px] font-bold text-foreground">Análise do comportamento</h2>
+            <h2 className="text-[14px] font-bold text-foreground">Objetivo</h2>
           </div>
-          <p className="text-[12px] text-muted-foreground mb-2.5 leading-snug">
-            Com base nas suas respostas, seu cão apresenta um padrão comum de:
+          <p className="text-[15px] font-bold text-foreground leading-snug mb-1.5">
+            {goalContent.h}
           </p>
-          <ul className="space-y-2">
-            {analysis.map((item, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: "hsl(142,70%,38%)" }} />
-                <span className="text-[12px] leading-snug text-foreground">{item}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            <HighlightInstinto>{goalContent.s}</HighlightInstinto>
+          </p>
         </div>
 
         {/* Card 4 - Evolução em 21 Dias */}
@@ -271,7 +283,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
               <p className="text-[13px] font-semibold text-foreground mt-1 leading-snug">
                 Seu cão tem grande potencial de evolução!
               </p>
-              <p className="text-[12px] text-foreground/80 mt-1.5 leading-relaxed">
+              <p className="text-[13px] text-foreground/80 mt-1.5 leading-relaxed">
                 Com o Protocolo POI, cães com esse perfil apresentam resultados reais em até 21 dias, quando o método é aplicado da forma correta.
               </p>
             </div>
@@ -281,7 +293,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
             <div className="flex items-center justify-center gap-1.5 mb-0.5">
               <CheckCircle2 className="h-4 w-4" style={{ color: "hsl(142,70%,38%)" }} />
               <p className="text-[13px] font-extrabold" style={{ color: "hsl(142,70%,28%)" }}>
-                +12.000 cães já transformados
+                +10.000 cães já transformados
               </p>
             </div>
             <p className="text-[11px]" style={{ color: "hsl(142,50%,30%)" }}>
@@ -292,7 +304,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
       </main>
 
       {/* Footer fixo */}
-      <footer className="px-5 pt-2 pb-3 flex-shrink-0">
+      <footer className="quiz-footer" ref={footerRef}>
         <button
           onClick={() => navigate("/quiz", { state: { ...s, step: 8 } as Record<string, unknown> })}
           className="w-full rounded-full font-bold text-white"
@@ -303,7 +315,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
             padding: "14px 20px",
           }}
         >
-          🎁 Quero aplicar o Protocolo POI
+          Continuar
         </button>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
           <Lock className="h-3 w-3" />

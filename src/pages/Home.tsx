@@ -1,13 +1,8 @@
 /**
  * Home.tsx — Splash inicial antes do quiz
  *
- * Nova estrutura:
- * 1. Logo (pequena)
- * 2. Barra de progresso (próxima da logo)
- * 3. Headline
- * 4. Subheadline
- * 5. Animação (slideshow GRANDE)
- * 6. Botão CTA / Barra de carregamento (FIXO no rodapé)
+ * Header (logo + barra) e footer (barra/botão) FIXOS via position:fixed
+ * — não se movem em nenhum dispositivo.
  *
  * Pixel: QuizStart dispara no clique do botão (via App.tsx).
  */
@@ -28,6 +23,8 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const startedAt = useRef<number>(Date.now());
+  const headerRef = useRef<HTMLElement | null>(null);
+  const footerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -50,14 +47,41 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
     return () => clearInterval(tick);
   }, []);
 
+  // Mede header/footer e expõe como CSS vars (mesma lógica do QuizShell)
+  useEffect(() => {
+    const update = () => {
+      if (headerRef.current) {
+        document.documentElement.style.setProperty(
+          "--quiz-header-h",
+          `${headerRef.current.offsetHeight}px`
+        );
+      }
+      if (footerRef.current) {
+        document.documentElement.style.setProperty(
+          "--quiz-footer-h",
+          `${footerRef.current.offsetHeight}px`
+        );
+      }
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    if (headerRef.current) ro.observe(headerRef.current);
+    if (footerRef.current) ro.observe(footerRef.current);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [ready]);
+
   const handleStart = () => {
     _navigate("/quiz", { state: { step: 1 } });
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background overflow-hidden">
-      {/* Header — logo pequena + barra próxima */}
-      <header className="px-5 pt-3 pb-2 flex-shrink-0">
+    <div className="quiz-shell">
+      {/* Header fixo */}
+      <header className="quiz-header" ref={headerRef}>
         <div className="flex items-center justify-center mb-1.5">
           <img src={logo} alt="DesafioPOI" className="h-4 w-auto" />
         </div>
@@ -69,23 +93,23 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
         </div>
       </header>
 
-      {/* Body */}
-      <main className="flex-1 flex flex-col px-5 min-h-0">
-        {/* Headline */}
-        <h1 className="text-[18px] font-bold leading-tight text-foreground text-center mt-4">
-          Receba um desafio de obediência personalizado para o seu cão
+      {/* Body com padding-top/bottom dinâmico (já configurado em quiz-body) */}
+      <main className="quiz-body items-center justify-start text-center">
+        {/* Headline com palavras em azul */}
+        <h1 className="text-[20px] font-extrabold leading-tight text-foreground mt-3">
+          Receba um <span className="text-primary">desafio de obediência personalizado</span> para o <span className="text-primary">seu cão</span>
         </h1>
 
         {/* Subheadline */}
-        <p className="text-[13px] leading-relaxed text-muted-foreground text-center mt-2">
+        <p className="text-[14px] leading-relaxed text-muted-foreground mt-2.5">
           Responda a um questionário de 2 minutos e receba um desafio personalizado com base no objetivo, padrões comportamentais, idade e raça.
         </p>
 
-        {/* Slideshow GRANDE — ocupa o espaço restante */}
-        <div className="flex-1 flex items-center justify-center mt-3">
+        {/* Slideshow */}
+        <div className="mt-4 w-full flex items-center justify-center">
           <div
             className="relative w-full"
-            style={{ maxWidth: "320px", aspectRatio: "1 / 1" }}
+            style={{ maxWidth: "300px", aspectRatio: "1 / 1" }}
           >
             {slides.map((src, i) => (
               <img
@@ -106,8 +130,8 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
         </div>
       </main>
 
-      {/* Footer FIXO — barra/botão antes da dobra */}
-      <footer className="px-5 pb-3 pt-2 flex-shrink-0">
+      {/* Footer fixo */}
+      <footer className="quiz-footer" ref={footerRef}>
         <div className="relative" style={{ height: "48px" }}>
           {/* Barra */}
           <div

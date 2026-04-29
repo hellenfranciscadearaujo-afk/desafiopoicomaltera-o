@@ -42,7 +42,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
 
-  const ctaLabel = `Quero transformar ${dogName} agora`;
+  const ctaLabel = `Quero o desafio personalizado ${dogName} agora`;
 
   return (
     <div className="mx-auto min-h-dvh max-w-md bg-secondary">
@@ -183,9 +183,9 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
         `}</style>
       </Section>
 
-      {/* Antes / Depois */}
+      {/* Antes / Depois (mais compacto) */}
       <Section>
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="mx-auto grid max-w-[280px] grid-cols-2 gap-2">
           <BACard tone="bad" label="AGORA" img={beforeImg} alt={`${dogName} antes do POI`} />
           <BACard tone="good" label="COM O POI" img={afterImg} alt={`${dogName} com o POI`} />
         </div>
@@ -244,30 +244,53 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
             ))}
           </div>
 
-          {/* Linha 3: Análise (3 bullets compactos) */}
+          {/* Linha 3: Objetivo (igual ao Diagnóstico) */}
           <div className="border-t border-border pt-2">
-            <p className="text-[10px] font-bold text-muted-foreground mb-1.5">Padrão identificado:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {(() => {
-                const items: string[] = ["Baixa consistência"];
-                const ch = s.challenges || [];
-                const hasAnxiety = ch.some((c) => c.includes("Destrói") || c.includes("Morde"));
-                const hasIgnore = ch.some((c) => c.includes("Ignora") || c.includes("Não obedece"));
-                if (hasAnxiety) items.push("Ansiedade com estímulos");
-                if (hasIgnore) items.push("Dependência do tutor");
-                if (!hasAnxiety && !hasIgnore) items.push("Reatividade a estímulos");
-                items.push("Falta de rotina estruturada");
-                return items.slice(0, 3).map((it, i) => (
-                  <div
-                    key={i}
-                    className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5"
-                  >
-                    <CheckCircle2 className="h-2.5 w-2.5" style={{ color: "hsl(142,70%,38%)" }} />
-                    <span className="text-[10px] font-medium text-foreground">{it}</span>
-                  </div>
-                ));
-              })()}
-            </div>
+            <p className="text-[10px] font-bold text-muted-foreground mb-1">Objetivo:</p>
+            {(() => {
+              const ch = s.challenges || [];
+              const map: Record<string, { title: string; desc: string }> = {
+                "Ignora completamente quando eu chamo.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
+                "Não obedece comandos básicos.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
+                "Late excessivamente para visitas ou outros cães.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
+                "Rosna ou demonstra agressividade.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
+                "Destrói objetos em casa quando fica sozinho.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
+                "Morde mãos, pés ou objetos o tempo todo.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
+                "Faz as necessidades no lugar errado.": { title: "Treino de Higiene", desc: "Ensinar o local correto e criar consistência no comportamento." },
+              };
+              if (ch.length === 1 && map[ch[0]]) {
+                return (
+                  <p className="text-[12px] font-bold text-foreground leading-snug">
+                    Treino de {map[ch[0]].title}
+                  </p>
+                );
+              }
+              if (ch.length >= 2) {
+                const labels: Record<string, string> = {
+                  "Morde mãos, pés ou objetos o tempo todo.": "morder",
+                  "Destrói objetos em casa quando fica sozinho.": "destruir",
+                  "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
+                  "Late excessivamente para visitas ou outros cães.": "latir",
+                  "Ignora completamente quando eu chamo.": "ignorar comandos",
+                  "Rosna ou demonstra agressividade.": "agressividade",
+                  "Não obedece comandos básicos.": "não obedecer",
+                };
+                const items = ch.map((c) => labels[c]).filter(Boolean);
+                let listStr = "";
+                if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
+                else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
+                return (
+                  <p className="text-[12px] font-bold text-foreground leading-snug">
+                    Corrigir: {listStr}
+                  </p>
+                );
+              }
+              return (
+                <p className="text-[12px] font-bold text-foreground leading-snug">
+                  Obediência POI Personalizada
+                </p>
+              );
+            })()}
           </div>
         </div>
       </Section>
@@ -381,7 +404,7 @@ const SecTag = ({ children }: { children: React.ReactNode }) => (
 const BACard = ({ tone, label, img, alt }: { tone: "bad" | "good"; label: string; img: string; alt: string }) => (
   <div className="overflow-hidden rounded-xl border border-border bg-card">
     <div
-      className={`py-1.5 text-center text-[14px] font-bold tracking-widest ${
+      className={`py-1 text-center text-[11px] font-bold tracking-widest ${
         tone === "bad" ? "bg-destructive/10 text-destructive" : "bg-success/15 text-success"
       }`}
     >

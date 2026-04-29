@@ -99,21 +99,29 @@
 @layer components {
   /* Quiz shell — full viewport, no page scroll */
   .quiz-shell {
-    @apply mx-auto flex w-full max-w-md flex-col bg-background;
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden;
+    @apply mx-auto w-full max-w-md bg-background;
+    position: relative;
+    min-height: 100dvh;
   }
 
   .quiz-header {
-    @apply flex flex-col gap-1.5 px-5 pt-3 pb-2;
-    flex-shrink: 0;
+    @apply flex flex-col gap-1.5 bg-background;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 28rem;
+    padding: 12px 20px 8px;
+    z-index: 50;
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
   }
 
   .quiz-body {
     @apply flex flex-col px-5;
-    flex: 1 1 auto;
-    min-height: 0;
+    padding-top: calc(var(--quiz-header-h, 60px) + 8px);
+    padding-bottom: calc(var(--quiz-footer-h, 100px) + 8px);
+    min-height: 100dvh;
     animation: fadeSlideIn 0.18s ease-out;
   }
 
@@ -124,32 +132,31 @@
 
   .quiz-content-fixed {
     @apply flex flex-col gap-1.5 pb-2;
-    flex-shrink: 0;
   }
 
   .quiz-answers {
     @apply flex flex-col gap-2 py-1;
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-  }
-
-  .quiz-answers::-webkit-scrollbar { width: 4px; }
-  .quiz-answers::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.3);
-    border-radius: 999px;
   }
 
   .quiz-footer {
-    @apply px-5 pt-2 pb-3;
-    flex-shrink: 0;
+    @apply bg-background;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 28rem;
+    padding: 12px 20px max(12px, env(safe-area-inset-bottom));
+    z-index: 50;
+    border-top: 1px solid hsl(var(--border) / 0.5);
   }
 
   .quiz-headline {
     @apply text-[20px] font-bold leading-tight text-foreground;
+  }
+
+  .quiz-subheadline {
+    @apply text-[15px] leading-snug text-muted-foreground;
   }
 
   .quiz-range {
@@ -181,10 +188,6 @@
     border: 3px solid #fff;
     box-shadow: 0 4px 12px rgba(43,108,240,0.4);
     cursor: grab;
-  }
-
-  .quiz-subheadline {
-    @apply text-[14px] leading-snug text-muted-foreground;
   }
 
   .quiz-image-placeholder {
