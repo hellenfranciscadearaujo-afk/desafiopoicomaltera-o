@@ -15,8 +15,14 @@ export default defineConfig(({ mode }) => ({
     dedupe: ["react", "react-dom"],
   },
   build: {
+    // Deixamos o Vite/Rollup fazer o code-splitting automático.
+    // O code-splitting manual estava quebrando a ordem de carregamento
+    // (vendor carregava antes do react-core e dava erro createContext).
     rollupOptions: {
-      output: {},
+      output: {
+        // Sem manualChunks: Vite cria chunks otimizados a partir
+        // dos lazy imports já existentes em App.tsx (Index, Loading, etc.)
+      },
     },
     assetsInlineLimit: 4096,
     minify: "esbuild",

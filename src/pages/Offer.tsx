@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3 } from "lucide-react";
 import beforeImg from "@/assets/before.webp";
 import afterImg from "@/assets/after.webp";
+import { getDogGender, article, articleDe } from "@/lib/dogGender";
 
 interface OfferState {
   dogName?: string;
@@ -14,6 +15,10 @@ interface OfferState {
 const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const s = _initialState as OfferState;
   const dogName = s.dogName?.trim() || "seu cão";
+  const hasName = !!s.dogName?.trim();
+  const dogG = hasName ? getDogGender(s.dogName) : "m";
+  const _o = article(dogG);    // "o" ou "a"
+  const _do = articleDe(dogG); // "do" ou "da"
   // Cupom igual ao da página Gift: POI68 + 4 primeiras letras do nome
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
   const coupon = `POI68${couponSuffix}`;
@@ -21,15 +26,78 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const age = s.age || "—";
   const level = s.level || 3;
 
-  const goal = useMemo(() => {
-    const ch = s.challenges || [];
-    if (ch.some((c) => c.toLowerCase().includes("late"))) return "Modulação de Reatividade e Latidos";
-    if (ch.some((c) => c.toLowerCase().includes("puxa"))) return "Controle de Guia e Passeios";
-    if (ch.some((c) => c.toLowerCase().includes("destrói"))) return "Ansiedade e Foco em Casa";
-    if (ch.some((c) => c.toLowerCase().includes("ignora"))) return "Atenção e Comandos Básicos";
-    if (ch.some((c) => c.toLowerCase().includes("necessidades"))) return "Treino de Higiene e Rotina";
-    return "Obediência POI Personalizada";
-  }, [s.challenges]);
+  // Mapa challenge -> Objetivo (idêntico ao usado em Diagnosis.tsx).
+  // Mantemos as duas páginas em sincronia para que o objetivo mostrado na
+  // página de oferta seja exatamente o mesmo que aparece no diagnóstico.
+  const challengeToGoal: Record<string, { title: string; desc: string }> = useMemo(() => ({
+    "Ignora completamente quando eu chamo.": {
+      title: "Atenção e Comandos Básicos",
+      desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+    },
+    "Não obedece comandos básicos.": {
+      title: "Atenção e Comandos Básicos",
+      desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+    },
+    "Late excessivamente para visitas ou outros cães.": {
+      title: "Modulação de Reatividade",
+      desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+    },
+    "Rosna ou demonstra agressividade.": {
+      title: "Modulação de Reatividade",
+      desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+    },
+    "Destrói objetos em casa quando fica sozinho.": {
+      title: "Ansiedade e Comportamento em Casa",
+      desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+    },
+    "Morde mãos, pés ou objetos o tempo todo.": {
+      title: "Ansiedade e Comportamento em Casa",
+      desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+    },
+    "Faz as necessidades no lugar errado.": {
+      title: "Treino de Higiene",
+      desc: "Ensinar o local correto e criar consistência no comportamento.",
+    },
+  }), []);
+
+  // Objetivo (idêntico à lógica do Diagnosis):
+  // - 0 challenges  -> texto genérico
+  // - 1 challenge   -> título + descrição daquele comportamento
+  // - 2+ challenges -> "Seu plano vai corrigir: X, Y e Z" + subheadline padrão
+  const goalContent = useMemo(() => {
+    const challenges = s.challenges || [];
+    if (challenges.length === 0) {
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
+    }
+    if (challenges.length === 1) {
+      const g = challengeToGoal[challenges[0]];
+      if (g) return { h: g.title, s: g.desc };
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
+    }
+    const map: Record<string, string> = {
+      "Morde mãos, pés ou objetos o tempo todo.": "morder",
+      "Destrói objetos em casa quando fica sozinho.": "destruir",
+      "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
+      "Late excessivamente para visitas ou outros cães.": "latir",
+      "Ignora completamente quando eu chamo.": "ignorar comandos",
+      "Rosna ou demonstra agressividade.": "agressividade",
+      "Não obedece comandos básicos.": "não obedecer",
+    };
+    const items = challenges.map((c) => map[c]).filter(Boolean);
+    let listStr = "";
+    if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
+    else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
+    return {
+      h: `Seu plano vai corrigir: ${listStr}`,
+      s: "O desafio vai reorganizar o instinto do seu cão, criando controle e respostas consistentes em todas essas situações.",
+    };
+  }, [s.challenges, challengeToGoal]);
 
   const [seconds, setSeconds] = useState(10 * 60);
 
@@ -85,7 +153,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
               Seu desafio está pronto
             </h2>
             <p className="text-[11px] leading-snug text-muted-foreground">
-              Com base nas suas respostas, criamos um plano personalizado para transformar o {dogName}.
+              Com base nas suas respostas, criamos um plano personalizado para transformar {_o} {dogName}.
             </p>
           </div>
 
@@ -246,50 +314,13 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
           {/* Linha 3: Objetivo (igual ao Diagnóstico) */}
           <div className="border-t border-border pt-2">
             <p className="text-[10px] font-bold text-muted-foreground mb-1">Objetivo:</p>
-            {(() => {
-              const ch = s.challenges || [];
-              const map: Record<string, { title: string; desc: string }> = {
-                "Ignora completamente quando eu chamo.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
-                "Não obedece comandos básicos.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
-                "Late excessivamente para visitas ou outros cães.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
-                "Rosna ou demonstra agressividade.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
-                "Destrói objetos em casa quando fica sozinho.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
-                "Morde mãos, pés ou objetos o tempo todo.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
-                "Faz as necessidades no lugar errado.": { title: "Treino de Higiene", desc: "Ensinar o local correto e criar consistência no comportamento." },
-              };
-              if (ch.length === 1 && map[ch[0]]) {
-                return (
-                  <p className="text-[12px] font-bold text-foreground leading-snug">
-                    Treino de {map[ch[0]].title}
-                  </p>
-                );
-              }
-              if (ch.length >= 2) {
-                const labels: Record<string, string> = {
-                  "Morde mãos, pés ou objetos o tempo todo.": "morder",
-                  "Destrói objetos em casa quando fica sozinho.": "destruir",
-                  "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
-                  "Late excessivamente para visitas ou outros cães.": "latir",
-                  "Ignora completamente quando eu chamo.": "ignorar comandos",
-                  "Rosna ou demonstra agressividade.": "agressividade",
-                  "Não obedece comandos básicos.": "não obedecer",
-                };
-                const items = ch.map((c) => labels[c]).filter(Boolean);
-                let listStr = "";
-                if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
-                else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
-                return (
-                  <p className="text-[12px] font-bold text-foreground leading-snug">
-                    Corrigir: {listStr}
-                  </p>
-                );
-              }
-              return (
-                <p className="text-[12px] font-bold text-foreground leading-snug">
-                  Obediência POI Personalizada
-                </p>
-              );
-            })()}
+            {/* Mostra exatamente o mesmo conteúdo do card "Objetivo" da página de Diagnóstico */}
+            <p className="text-[12px] font-bold text-foreground leading-snug">
+              {goalContent.h}
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+              {goalContent.s}
+            </p>
           </div>
         </div>
       </Section>
@@ -304,7 +335,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
       <Section>
         <div className="rounded-2xl border-l-4 border-primary bg-accent/60 p-4">
           <p className="mb-2 text-[14px] font-bold text-primary">
-            A culpa não é sua (e nem do {dogName})
+            A culpa não é sua (e nem {_do} {dogName})
           </p>
           <p className="text-[14px] leading-relaxed text-foreground/80">
             Os problemas que você enfrenta são reflexos de métodos tradicionais que tentam "humanizar" o cão. Gritos e punições não funcionam porque ignoram o que realmente move um cachorro:{" "}

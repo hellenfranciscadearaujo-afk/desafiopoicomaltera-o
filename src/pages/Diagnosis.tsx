@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, User, PawPrint, Calendar, BarChart3, Search, TrendingUp, Shield, CheckCircle2, Lock } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { HighlightInstinto } from "@/components/HighlightInstinto";
+import { getDogGender, articleDe } from "@/lib/dogGender";
 
 interface DiagState {
   dogName?: string;
@@ -59,6 +60,9 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
   const navigate = _navigate;
   const s = _initialState as DiagState;
   const dogName = s.dogName?.trim() || "seu cão";
+  const hasName = !!s.dogName?.trim();
+  const dogG = hasName ? getDogGender(s.dogName) : "m";
+  const _do = articleDe(dogG); // "do" ou "da"
   const level = s.level || 3;
   const breed = s.breed || "—";
   const age = s.age || "—";
@@ -155,7 +159,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
       {/* Body */}
       <main className="quiz-body">
         <h1 className="text-center text-[18px] font-extrabold leading-tight text-foreground">
-          Diagnóstico comportamental do <span className="text-highlight">{dogName}</span>
+          Diagnóstico comportamental {_do} <span className="text-highlight">{dogName}</span>
         </h1>
         <p className="mt-1.5 text-center text-[12px] leading-relaxed text-muted-foreground">
           Com base nas suas respostas, analisamos o perfil do seu cão para criar o melhor plano de treino.

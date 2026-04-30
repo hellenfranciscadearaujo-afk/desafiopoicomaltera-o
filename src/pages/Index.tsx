@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { QuizShell } from "@/components/quiz/QuizShell";
+import { getDogGender, articleDe } from "@/lib/dogGender";
 import quiz3 from "@/assets/quiz-3-sit.webp";
 import quiz4 from "@/assets/quiz-4-walk.webp";
 import logo from "@/assets/logo.png";
@@ -75,6 +76,11 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
     setA((p) => ({ ...p, [k]: v }));
 
   const dogName = a.dogName.trim() || "seu cão";
+  // Gênero do nome real (só usado quando o usuário digitou um nome).
+  // Se não digitou, mantemos o masculino padrão ("o seu cão").
+  const hasName = !!a.dogName.trim();
+  const dogG = hasName ? getDogGender(a.dogName) : "m";
+  const _do = articleDe(dogG); // "do" ou "da"
 
   // Mapa de comportamentos para headlines/subheadlines dinâmicas (passo 2)
   const challengeContent: Record<string, { h: string; s: string }> = {
@@ -113,7 +119,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
     const count = a.challenges.length;
     if (count >= 3) {
       return {
-        h: "Isso já virou um padrão de comportamento",
+        h: "Os problemas já estão acumulados",
         s: "Quando vários problemas aparecem ao mesmo tempo, seu cão não está reagindo por acaso — ele está seguindo um padrão sem controle.",
       };
     }
@@ -402,7 +408,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             step={6}
             totalSteps={TOTAL}
             onBack={back}
-            headline={`Qual a raça do ${dogName}?`}
+            headline={`Qual a raça ${_do} ${dogName}?`}
             subheadline="Esses detalhes ajudam a traçar o perfil ideal para o Protocolo POI."
             footer={
               <button
@@ -439,7 +445,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             step={7}
             totalSteps={TOTAL}
             onBack={back}
-            headline={`Qual o nível de obediência do ${dogName} hoje?`}
+            headline={`Qual o nível de obediência ${_do} ${dogName} hoje?`}
             subheadline="Não se preocupe — estamos aqui para ajudar a transformá-lo!"
             footer={
               <button

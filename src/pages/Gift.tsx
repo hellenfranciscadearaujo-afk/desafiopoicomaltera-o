@@ -25,6 +25,7 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
   const navigate = _navigate;
   const s = _initialState as GiftState;
   const dogName = s.dogName?.trim() || "seu cão";
+  const hasName = !!s.dogName?.trim();
 
   // Cupom: POI68 + 4 primeiras letras do nome em maiúsculo (ou POI68 sozinho se vazio)
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
@@ -54,18 +55,27 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
 
       <main className="quiz-body items-center text-center" style={{ justifyContent: "center" }}>
         {/* Wrapper que cresce e centraliza headline + presente + cupom verticalmente */}
-        <div className="flex flex-col items-center justify-center flex-1 w-full" style={{ minHeight: "calc(100dvh - var(--quiz-header-h, 60px) - var(--quiz-footer-h, 100px) - 32px)" }}>
+        <div className="flex flex-col items-center justify-center flex-1 w-full gap-3" style={{ minHeight: "calc(100dvh - var(--quiz-header-h, 60px) - var(--quiz-footer-h, 100px) - 32px)" }}>
 
-          {/* Headline + subheadline */}
-          <h1 className="text-[17px] font-bold leading-tight text-foreground">
-            Por ter chegado até aqui, separamos um presente especial para <span className="text-highlight">{dogName}</span>
-          </h1>
-          <p className="text-[13px] leading-relaxed text-muted-foreground mt-1.5">
-            {opened ? "Aqui está o seu presente!" : "Clique e garanta o seu presente."}
-          </p>
+          {/* Bloco de textos — headline e subheadline com altura mínima fixa para
+              o presente não subir e cobrir os textos quando o estado muda. */}
+          <div className="flex flex-col items-center px-1" style={{ minHeight: "92px" }}>
+            <h1 className="text-[17px] font-bold leading-tight text-foreground">
+              {opened ? (
+                <>Você recebeu um presente exclusivo!!</>
+              ) : hasName ? (
+                <>Por ter chegado até aqui, separamos um presente especial para <span className="text-highlight">{dogName}</span></>
+              ) : (
+                <>Por ter chegado até aqui, separamos um presente especial para você</>
+              )}
+            </h1>
+            <p className="text-[13px] leading-relaxed text-muted-foreground mt-1.5">
+              {opened ? "Aqui está o seu presente." : "Clique aqui e garanta o seu presente."}
+            </p>
+          </div>
 
           {/* Caixa de presente — centralizada */}
-          <div className="flex items-center justify-center w-full my-4">
+          <div className="flex items-center justify-center w-full my-2">
             <div
               className="relative cursor-pointer"
               style={{
@@ -214,14 +224,16 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
                   />
                 </div>
 
-                {/* Balão "Clique aqui" piscando */}
+                {/* Balão "Clique aqui" piscando — DENTRO do presente */}
                 <div
-                  className="absolute -top-7 -right-3 rounded-full px-2.5 py-1 text-[10px] font-bold text-white whitespace-nowrap"
+                  className="absolute left-1/2 rounded-full px-2.5 py-1 text-[10px] font-bold text-white whitespace-nowrap"
                   style={{
+                    top: "55%",
+                    transform: "translate(-50%, -50%) rotate(-4deg)",
                     background: "#FF4757",
                     boxShadow: "0 4px 12px rgba(255,71,87,0.4)",
                     animation: "blink 1s ease-in-out infinite",
-                    transform: "rotate(8deg)",
+                    zIndex: 5,
                   }}
                 >
                   👆 Clique aqui
@@ -304,8 +316,8 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
           50%      { opacity: 1;   transform: scale(1.2) rotate(180deg); }
         }
         @keyframes blink {
-          0%, 100% { opacity: 1; transform: rotate(8deg) scale(1); }
-          50%      { opacity: 0.7; transform: rotate(8deg) scale(1.06); }
+          0%, 100% { opacity: 1; transform: translate(-50%, -50%) rotate(-4deg) scale(1); }
+          50%      { opacity: 0.7; transform: translate(-50%, -50%) rotate(-4deg) scale(1.06); }
         }
         @keyframes bounce-soft {
           0%, 100% { transform: translateY(0); }
