@@ -49,7 +49,7 @@ function FunnelOrchestrator() {
 
   // Sempre que mudar de página (stage), volta ao topo
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [stage]);
 
   const navigate = (to: string, opts?: { state?: QuizData; replace?: boolean }) => {
