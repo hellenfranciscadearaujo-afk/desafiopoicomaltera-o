@@ -1,4 +1,4 @@
-.# DesafioPOI — Quiz / Funil
+# DesafioPOI — Quiz / Funil
 
 Funil de quiz comportamental canino com Meta Pixel + CAPI híbrido.
 
@@ -88,4 +88,3 @@ Cada evento dispara em **paralelo no Pixel (browser) e na CAPI (servidor)** com 
 - 🧹 Removidos imports e componentes não usados em `Index.tsx` e `Offer.tsx`
 - 🐛 Corrigidos 4 erros de ESLint que bloqueavam o lint
 - 🎨 Sintaxe `hsl(...,a)` substituída por `hsla(...)` válido em `Loading.tsx`
-force deploy

@@ -1,11 +1,18 @@
 /**
  * OfferSummaryModal — bottom sheet exibido ao clicar nos CTAs de compra.
  *
- * - Sobe de baixo com animação suave
- * - Ocupa 80vh (4/5 da tela)
- * - O botão "Continuar para pagamento" fica em rodapé STICKY,
- *   sempre visível na primeira dobra mesmo se o conteúdo for longo.
+ * Comportamento:
+ * - Sobe de baixo com animação suave (320ms cubic-bezier)
+ * - Ocupa 80vh / 80dvh (4/5 da tela)
+ * - Botão "Continuar para pagamento" em rodapé STICKY,
+ *   sempre visível na primeira dobra mesmo se o conteúdo do meio rolar
  * - Fecha com X, ESC, ou clique no overlay
+ *
+ * Paleta:
+ * - Cores informativas (cupom, item, headline, "GRÁTIS") usam o azul navy
+ *   gradient da identidade do site (#0a1638 → #2b6cf0).
+ * - Verde aparece APENAS em dois lugares de destaque: ícones ✓ dos bônus
+ *   e o botão CTA "Continuar para o pagamento" (sucesso/ação).
  */
 
 import { useEffect, useState } from "react";
@@ -38,18 +45,21 @@ const BONUSES: Bonus[] = [
   { label: "Adeus ansiedade", oldPrice: "R$ 34,90" },
 ];
 
-const TOTAL_SAVED = "R$ 97,60";
+// Gradient azul navy oficial do site (var(--gradient-primary))
+const NAVY_GRADIENT = "linear-gradient(135deg, hsl(220 70% 22%), hsl(218 80% 38%))";
+const NAVY_SOLID = "hsl(220 70% 22%)";
+
+// Verde mantido SOMENTE para ícones ✓ e botão CTA
+const GREEN_GRADIENT = "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)";
+const GREEN_SOLID = "hsl(142,70%,38%)";
 
 export default function OfferSummaryModal({ open, onClose, checkoutUrl, dogName, artDe, coupon, timer }: Props) {
-  // Para a animação de entrada/saída funcionar, mantemos o nó montado
-  // por um pequeno tempo após o `open` virar false.
   const [shouldRender, setShouldRender] = useState(open);
   const [animateIn, setAnimateIn] = useState(false);
 
   useEffect(() => {
     if (open) {
       setShouldRender(true);
-      // dois rAFs para garantir que o nó já está pintado antes de aplicar a transform final
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimateIn(true));
       });
@@ -107,10 +117,10 @@ export default function OfferSummaryModal({ open, onClose, checkoutUrl, dogName,
       >
         {/* HEADER — alça + título + close */}
         <div className="flex-shrink-0 px-5 pt-2 pb-3">
-          <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-300" />
+          <div className="mx-auto mb-2.5 h-1 w-10 rounded-full bg-slate-300" />
           <div className="flex items-start justify-between gap-3">
-            <h2 className="text-[16px] font-bold leading-tight text-foreground">
-              Seu plano para <span className="text-primary">{dogName}</span>
+            <h2 className="text-[18px] font-extrabold leading-tight" style={{ color: NAVY_SOLID }}>
+              Desafio POI personalizado {artDe} <span style={{ color: "hsl(218 80% 45%)" }}>{dogName}</span>
             </h2>
             <button
               onClick={onClose}
@@ -124,65 +134,75 @@ export default function OfferSummaryModal({ open, onClose, checkoutUrl, dogName,
 
         {/* BODY — conteúdo scrollável */}
         <div className="flex-1 overflow-y-auto px-5 pb-3">
-          {/* Cupom + timer */}
+          {/* Cupom + timer (azul navy) */}
           <div
-            className="mb-3 flex items-center justify-between rounded-xl px-3 py-2"
+            className="mb-3 flex items-center justify-between rounded-xl px-3.5 py-2.5"
             style={{
-              background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
+              background: NAVY_GRADIENT,
               color: "white",
             }}
           >
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-base">🎁</span>
               <div className="min-w-0">
-                <p className="truncate text-[10px] font-bold uppercase tracking-wider opacity-90">
+                <p className="truncate text-[11px] font-bold uppercase tracking-wider opacity-90">
                   Cupom ativo
                 </p>
-                <p className="truncate text-[12px] font-extrabold tracking-wider">{coupon}</p>
+                <p className="truncate text-[14px] font-extrabold tracking-wider">{coupon}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[9px] font-bold uppercase tracking-wider opacity-90">
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-90">
                 Reservado por
               </p>
-              <p className="text-[16px] font-extrabold tabular-nums leading-none">{timer}</p>
+              <p className="text-[18px] font-extrabold tabular-nums leading-none">{timer}</p>
             </div>
           </div>
 
-          {/* Item principal */}
-          <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-            <p className="text-[13px] font-bold text-foreground">
-              Desafio personalizado {artDe} {dogName}
-            </p>
-            <p className="text-[11px] text-muted-foreground">
+          {/* Item principal — destaque azul claro */}
+          <div
+            className="mb-3 rounded-xl px-3.5 py-3"
+            style={{
+              background: "hsl(218 80% 96%)",
+              border: "1px solid hsl(218 80% 88%)",
+            }}
+          >
+            <p className="text-[14px] font-bold" style={{ color: NAVY_SOLID }}>
               Programa de 21 dias · Acesso total
+            </p>
+            <p className="text-[12px] mt-0.5" style={{ color: "hsl(220 25% 35%)" }}>
+              Plano completo personalizado para {artDe} {dogName}.
             </p>
           </div>
 
           {/* Headline dos bônus */}
-          <p className="mb-2 text-[12px] leading-snug text-foreground">
+          <p className="mb-2.5 text-[13px] leading-snug" style={{ color: NAVY_SOLID }}>
             Para chegarmos no potencial máximo {artDe} <strong>{dogName}</strong>, adicionamos esses bônus especiais:
           </p>
 
           {/* Lista de bônus */}
-          <div className="mb-2 space-y-1.5">
+          <div className="mb-2 space-y-2">
             {BONUSES.map((b, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 px-2.5 py-2"
+                className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5"
+                style={{ borderColor: "hsl(220 15% 88%)" }}
               >
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {/* CHECK VERDE — destaque intencional */}
                   <span
                     className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
-                    style={{ background: "hsl(142,70%,38%)" }}
+                    style={{ background: GREEN_SOLID }}
                   >
                     <Check className="h-3 w-3 text-white" strokeWidth={3} />
                   </span>
-                  <span className="truncate text-[12px] font-medium text-foreground">{b.label}</span>
+                  <span className="truncate text-[13px] font-semibold" style={{ color: NAVY_SOLID }}>
+                    {b.label}
+                  </span>
                 </div>
                 <div className="flex flex-shrink-0 items-baseline gap-1.5">
-                  <span className="text-[11px] text-slate-400 line-through">{b.oldPrice}</span>
-                  <span className="text-[11px] font-bold" style={{ color: "hsl(142,70%,38%)" }}>
+                  <span className="text-[12px] text-slate-400 line-through">{b.oldPrice}</span>
+                  <span className="text-[12px] font-extrabold" style={{ color: "hsl(218 80% 45%)" }}>
                     GRÁTIS
                   </span>
                 </div>
@@ -193,28 +213,35 @@ export default function OfferSummaryModal({ open, onClose, checkoutUrl, dogName,
 
         {/* FOOTER STICKY — botão sempre visível na primeira dobra */}
         <div
-          className="flex-shrink-0 border-t border-slate-200 bg-white px-5 pt-3 pb-4"
-          style={{ paddingBottom: "max(env(safe-area-inset-bottom), 16px)" }}
+          className="flex-shrink-0 border-t bg-white px-5 pt-3 pb-4"
+          style={{
+            borderColor: "hsl(220 15% 90%)",
+            paddingBottom: "max(env(safe-area-inset-bottom), 16px)",
+          }}
         >
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] text-muted-foreground">Você está economizando</span>
-            <span className="text-[15px] font-extrabold" style={{ color: "hsl(142,70%,38%)" }}>
-              {TOTAL_SAVED}
+          {/* Resumo de preço — De R$118,00 por apenas R$37,90 */}
+          <p className="mb-2.5 text-center text-[14px] font-medium" style={{ color: "hsl(220 25% 35%)" }}>
+            De{" "}
+            <span className="text-slate-400 line-through">R$ 118,00</span>{" "}
+            <span style={{ color: "hsl(220 25% 35%)" }}>por apenas</span>{" "}
+            <span className="text-[17px] font-extrabold" style={{ color: GREEN_SOLID }}>
+              R$ 37,90
             </span>
-          </div>
+          </p>
 
+          {/* CTA — VERDE (destaque de ação) */}
           <a
             href={checkoutUrl}
-            className="block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline"
+            className="block w-full rounded-full py-3.5 text-center text-[15px] font-extrabold text-white no-underline"
             style={{
-              background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
+              background: GREEN_GRADIENT,
               boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
             }}
           >
             CONTINUAR PARA O PAGAMENTO →
           </a>
 
-          <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground">
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px]" style={{ color: "hsl(220 20% 45%)" }}>
             <Lock className="h-3 w-3" />
             <span>Pagamento 100% seguro · Garantia de 7 dias</span>
           </div>
