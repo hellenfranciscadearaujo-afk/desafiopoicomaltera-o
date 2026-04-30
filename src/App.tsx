@@ -56,7 +56,6 @@ function FunnelOrchestrator() {
     const data = opts?.state ?? {};
     setQuizData((prev) => ({ ...prev, ...data }));
 
-    // Sempre que navega entre etapas, volta para o topo da página
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 
     if (to === "/" || to === "/quiz") {
