@@ -21,7 +21,9 @@
       html,body{height:100%;background:#fff;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
       body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Inter",sans-serif;color:#0a1638;overflow-x:hidden}
       #root{min-height:100vh;display:flex;flex-direction:column}
-
+      #initial-splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+      #initial-splash .spinner{width:36px;height:36px;border:3px solid #e3e6f0;border-top-color:#2b6cf0;border-radius:50%;animation:spin .8s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
     </style>
 
     <!-- Meta Pixel Code -->
@@ -35,7 +37,6 @@
       s.parentNode.insertBefore(t,s)}(window, document,'script',
       'https://connect.facebook.net/en_US/fbevents.js');
       fbq('init', '1647727386472022');
-      fbq('track', 'PageView');
       fbq('set', 'autoConfig', false, '1647727386472022');
     </script>
     <!-- End Meta Pixel Code -->
@@ -43,7 +44,11 @@
 
   <body>
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1647727386472022&ev=PageView&noscript=1" /></noscript>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-splash">
+        <div class="spinner"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
