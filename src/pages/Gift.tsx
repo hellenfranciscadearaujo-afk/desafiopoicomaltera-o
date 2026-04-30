@@ -52,50 +52,53 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-start px-5 pt-2 text-center overflow-hidden">
-        {/* Headline + subheadline (sempre no topo) */}
-        <h1 className="text-[17px] font-bold leading-tight text-foreground">
-          Por ter chegado até aqui, separamos um presente especial para <span className="text-primary">{dogName}</span>
-        </h1>
-        <p className="text-[12px] leading-relaxed text-muted-foreground mt-1.5">
-          {opened ? "Aqui está o seu presente!" : "Clique e garanta o seu presente."}
-        </p>
+      <main className="quiz-body items-center text-center" style={{ justifyContent: "center" }}>
+        {/* Wrapper que cresce e centraliza headline + presente + cupom verticalmente */}
+        <div className="flex flex-col items-center justify-center flex-1 w-full" style={{ minHeight: "calc(100dvh - var(--quiz-header-h, 60px) - var(--quiz-footer-h, 100px) - 32px)" }}>
 
-        {/* Caixa de presente */}
-        <div className="flex-1 flex items-center justify-center w-full">
-          <div
-            className="relative cursor-pointer"
-            style={{
-              width: opened ? "230px" : "180px",
-              height: opened ? "230px" : "180px",
-              transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
-            }}
-            onClick={handleOpen}
-          >
-            {/* Sparkles ao redor */}
-            {!opened && (
-              <>
-                {[
-                  { top: "-10px", left: "20%", delay: "0s" },
-                  { top: "10%", right: "-14px", delay: "0.4s" },
-                  { bottom: "20%", left: "-12px", delay: "0.8s" },
-                  { bottom: "-8px", right: "25%", delay: "1.2s" },
-                  { top: "30%", left: "-16px", delay: "0.2s" },
-                  { top: "-6px", right: "30%", delay: "1s" },
-                ].map((p, i) => (
-                  <span
-                    key={i}
-                    className="absolute"
-                    style={{
-                      ...p,
-                      fontSize: "22px",
-                      animation: "sparkle 1.6s ease-in-out infinite",
-                      animationDelay: p.delay,
-                    }}
-                  >
-                    ✨
-                  </span>
-                ))}
+          {/* Headline + subheadline */}
+          <h1 className="text-[17px] font-bold leading-tight text-foreground">
+            Por ter chegado até aqui, separamos um presente especial para <span className="text-primary">{dogName}</span>
+          </h1>
+          <p className="text-[13px] leading-relaxed text-muted-foreground mt-1.5">
+            {opened ? "Aqui está o seu presente!" : "Clique e garanta o seu presente."}
+          </p>
+
+          {/* Caixa de presente — centralizada */}
+          <div className="flex items-center justify-center w-full my-6">
+            <div
+              className="relative cursor-pointer"
+              style={{
+                width: opened ? "230px" : "180px",
+                height: opened ? "230px" : "180px",
+                transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              }}
+              onClick={handleOpen}
+            >
+              {/* Sparkles ao redor */}
+              {!opened && (
+                <>
+                  {[
+                    { top: "-10px", left: "20%", delay: "0s" },
+                    { top: "10%", right: "-14px", delay: "0.4s" },
+                    { bottom: "20%", left: "-12px", delay: "0.8s" },
+                    { bottom: "-8px", right: "25%", delay: "1.2s" },
+                    { top: "30%", left: "-16px", delay: "0.2s" },
+                    { top: "-6px", right: "30%", delay: "1s" },
+                  ].map((p, i) => (
+                    <span
+                      key={i}
+                      className="absolute"
+                      style={{
+                        ...p,
+                        fontSize: "22px",
+                        animation: "sparkle 1.6s ease-in-out infinite",
+                        animationDelay: p.delay,
+                      }}
+                    >
+                      ✨
+                    </span>
+                  ))}
               </>
             )}
 
@@ -277,17 +280,19 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
             </div>
           </div>
         )}
+        </div>
       </main>
 
-      <footer
-        className="quiz-footer"
-        style={{
-          opacity: opened ? 1 : 0,
-          transition: "opacity 0.5s ease-in-out 0.4s",
-          pointerEvents: opened ? "auto" : "none",
-        }}
-      >
-        <button className="cta-success" onClick={handleClaim}>
+      <footer className="quiz-footer">
+        <button
+          className="cta-success"
+          onClick={handleClaim}
+          style={{
+            opacity: opened ? 1 : 0,
+            transition: "opacity 0.5s ease-in-out 0.4s",
+            pointerEvents: opened ? "auto" : "none",
+          }}
+        >
           🎁 Receber meu presente
         </button>
       </footer>

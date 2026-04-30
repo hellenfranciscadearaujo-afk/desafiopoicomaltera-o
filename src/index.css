@@ -120,7 +120,7 @@
   .quiz-body {
     @apply flex flex-col px-5;
     padding-top: calc(var(--quiz-header-h, 60px) + 8px);
-    padding-bottom: calc(var(--quiz-footer-h, 100px) + 8px);
+    padding-bottom: calc(var(--quiz-footer-h, 100px) + 24px);
     min-height: 100dvh;
     animation: fadeSlideIn 0.18s ease-out;
   }

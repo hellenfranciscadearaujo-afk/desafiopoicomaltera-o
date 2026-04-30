@@ -66,8 +66,14 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
     ...(locationState.level !== undefined && { level: locationState.level }),
   });
 
-  const next = () => setStep((s) => Math.min(TOTAL, s + 1));
-  const back = () => setStep((s) => Math.max(1, s - 1));
+  const next = () => {
+    setStep((s) => Math.min(TOTAL, s + 1));
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+  const back = () => {
+    setStep((s) => Math.max(1, s - 1));
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
   const update = <K extends keyof Answers>(k: K, v: Answers[K]) =>
     setA((p) => ({ ...p, [k]: v }));
 

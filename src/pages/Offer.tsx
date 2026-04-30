@@ -440,18 +440,19 @@ const DRow = ({ k, v, hot }: { k: string; v: string; hot?: boolean }) => (
 
 const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; coupon: string; mm: string; ss: string; dogName: string }) => (
   <div
-    className="mb-3 overflow-hidden rounded-2xl border-2"
+    className="relative mb-3 rounded-2xl border-2"
     style={{
       borderColor: "#F59E0B",
       background: "linear-gradient(180deg, #FFF4E6 0%, #FFEED5 100%)",
       boxShadow: "0 8px 24px rgba(245,158,11,0.18)",
     }}
   >
-    {/* Topo — timer + cupom + 68% */}
+    {/* Topo — timer + cupom + 68% (com overflow hidden só na faixa colorida) */}
     <div
-      className="flex items-center justify-center gap-1.5 px-3 py-2 text-white text-[12px] font-extrabold flex-wrap"
+      className="flex items-center justify-center gap-1.5 px-3 py-2 text-white text-[12px] font-extrabold flex-wrap rounded-t-xl"
       style={{
         background: "linear-gradient(90deg, #F59E0B 0%, #EF4444 100%)",
+        margin: "-2px -2px 0",
       }}
     >
       <span>🔥</span>
@@ -462,8 +463,23 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
       <span>68% DE DESCONTO</span>
     </div>
 
-    {/* Corpo — 2 colunas (preço) + selo 68% OFF */}
+    {/* Corpo — 2 colunas (preço) */}
     <div className="relative px-4 pt-4 pb-3">
+      {/* Selo 68% OFF circular — flutuante acima do card, sem sobrepor preços */}
+      <div
+        className="absolute flex h-14 w-14 items-center justify-center rounded-full text-white text-[11px] font-extrabold leading-tight text-center"
+        style={{
+          background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+          boxShadow: "0 4px 12px rgba(239,68,68,0.4)",
+          top: "-22px",
+          right: "12px",
+          transform: "rotate(8deg)",
+          zIndex: 2,
+        }}
+      >
+        68%<br />OFF
+      </div>
+
       <div className="grid grid-cols-2 gap-2">
         <div className="text-center">
           <p className="text-[12px] font-medium text-muted-foreground mb-1">De:</p>
@@ -477,23 +493,9 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
         </div>
       </div>
 
-      {/* Selo 68% OFF circular */}
-      <div
-        className="absolute flex h-14 w-14 items-center justify-center rounded-full text-white text-[11px] font-extrabold leading-tight text-center"
-        style={{
-          background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
-          boxShadow: "0 4px 12px rgba(239,68,68,0.4)",
-          top: "8px",
-          right: "8px",
-          transform: "rotate(8deg)",
-        }}
-      >
-        68%<br />OFF
-      </div>
-
       {/* CTA dentro do card */}
       <a
-        href="https://pay.desafiopoi21days.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
+        href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
         className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline"
         style={{
           background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
@@ -538,7 +540,7 @@ const PriceBlock = () => (
 
 const CTA = ({ label }: { label: string }) => (
   <a
-    href="https://pay.desafiopoi21days.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
+    href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
     className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline"
   >{label}</a>
 );
