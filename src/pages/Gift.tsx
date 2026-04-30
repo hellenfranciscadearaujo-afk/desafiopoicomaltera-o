@@ -58,19 +58,19 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
 
           {/* Headline + subheadline */}
           <h1 className="text-[17px] font-bold leading-tight text-foreground">
-            Por ter chegado até aqui, separamos um presente especial para <span className="text-primary">{dogName}</span>
+            Por ter chegado até aqui, separamos um presente especial para <span className="text-highlight">{dogName}</span>
           </h1>
           <p className="text-[13px] leading-relaxed text-muted-foreground mt-1.5">
             {opened ? "Aqui está o seu presente!" : "Clique e garanta o seu presente."}
           </p>
 
           {/* Caixa de presente — centralizada */}
-          <div className="flex items-center justify-center w-full my-6">
+          <div className="flex items-center justify-center w-full my-4">
             <div
               className="relative cursor-pointer"
               style={{
-                width: opened ? "230px" : "180px",
-                height: opened ? "230px" : "180px",
+                width: opened ? "200px" : "150px",
+                height: opened ? "200px" : "150px",
                 transition: "all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
               }}
               onClick={handleOpen}
@@ -216,11 +216,12 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
 
                 {/* Balão "Clique aqui" piscando */}
                 <div
-                  className="absolute -top-9 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[11px] font-bold text-white whitespace-nowrap"
+                  className="absolute -top-7 -right-3 rounded-full px-2.5 py-1 text-[10px] font-bold text-white whitespace-nowrap"
                   style={{
                     background: "#FF4757",
                     boxShadow: "0 4px 12px rgba(255,71,87,0.4)",
                     animation: "blink 1s ease-in-out infinite",
+                    transform: "rotate(8deg)",
                   }}
                 >
                   👆 Clique aqui
@@ -303,8 +304,8 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
           50%      { opacity: 1;   transform: scale(1.2) rotate(180deg); }
         }
         @keyframes blink {
-          0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-          50%      { opacity: 0.7; transform: translateX(-50%) scale(1.06); }
+          0%, 100% { opacity: 1; transform: rotate(8deg) scale(1); }
+          50%      { opacity: 0.7; transform: rotate(8deg) scale(1.06); }
         }
         @keyframes bounce-soft {
           0%, 100% { transform: translateY(0); }

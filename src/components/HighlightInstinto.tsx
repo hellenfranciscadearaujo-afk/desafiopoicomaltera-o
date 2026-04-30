@@ -15,7 +15,7 @@ export const HighlightInstinto = ({ children, className }: Props) => {
     <span className={className}>
       {parts.map((part, i) =>
         /^instintos?$/i.test(part) ? (
-          <span key={i} className="font-bold text-primary">
+          <span key={i} className="font-bold text-highlight">
             {part}
           </span>
         ) : (

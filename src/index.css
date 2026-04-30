@@ -17,6 +17,7 @@
     --primary: 220 70% 22%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 218 75% 35%;
+    --highlight: 216 90% 55%;
 
     --secondary: 215 30% 96%;
     --secondary-foreground: 220 45% 15%;
@@ -97,6 +98,11 @@
 }
 
 @layer components {
+  /* Cor de destaque para palavras-chave em headlines */
+  .text-highlight {
+    color: hsl(var(--highlight));
+  }
+
   /* Quiz shell — full viewport, no page scroll */
   .quiz-shell {
     @apply mx-auto w-full max-w-md bg-background;

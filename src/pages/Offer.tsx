@@ -69,23 +69,23 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
         </div>
       </div>
 
-      {/* Hero — Parabéns + Presente resgatado */}
+      {/* Hero — Parabéns + Presente resgatado (compacto) */}
       <Section>
-        <div className="grid grid-cols-[1.4fr_1fr] gap-3 items-center">
+        <div className="grid grid-cols-[1.4fr_1fr] gap-2 items-center">
           {/* Coluna esquerda: parabéns */}
           <div>
-            <div className="flex items-start gap-2 mb-1.5">
-              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(142,70%,38%)" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div className="flex items-start gap-1.5 mb-1">
+              <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full mt-0.5" style={{ background: "hsl(142,70%,38%)" }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
-              <h1 className="text-[19px] font-extrabold leading-tight text-foreground">
+              <h1 className="text-[16px] font-extrabold leading-tight text-foreground">
                 Parabéns, {dogName}!
               </h1>
             </div>
-            <h2 className="text-[18px] font-extrabold leading-tight text-foreground mb-2">
+            <h2 className="text-[15px] font-extrabold leading-tight text-foreground mb-1.5">
               Seu desafio está pronto
             </h2>
-            <p className="text-[12px] leading-relaxed text-muted-foreground">
+            <p className="text-[11px] leading-snug text-muted-foreground">
               Com base nas suas respostas, criamos um plano personalizado para transformar o {dogName}.
             </p>
           </div>
@@ -195,13 +195,13 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Resumo do diagnóstico — espelha a página de Diagnóstico (compacto) */}
       <Section>
-        <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="rounded-2xl border border-border bg-card p-2.5 shadow-sm">
+          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             📋 Resumo do diagnóstico
           </p>
 
           {/* Linha 1: Raça + Idade + Nível X/5 */}
-          <div className="grid grid-cols-3 gap-2 mb-2.5">
+          <div className="grid grid-cols-3 gap-1.5 mb-1.5">
             <div className="flex items-center gap-1.5">
               <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent">
                 <PawPrint className="h-3.5 w-3.5 text-primary" />
@@ -231,12 +231,12 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
             </div>
           </div>
 
-          {/* Linha 2: Bolinhas */}
-          <div className="flex items-center gap-1.5 mb-2.5 px-1">
+          {/* Linha 2: Bolinhas mais finas */}
+          <div className="flex items-center gap-1 mb-2 px-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
-                className="h-2 flex-1 rounded-full"
+                className="h-1 flex-1 rounded-full"
                 style={{
                   background: n <= level ? "hsl(218,80%,42%)" : "hsl(var(--muted))",
                 }}
@@ -418,11 +418,11 @@ const BACard = ({ tone, label, img, alt }: { tone: "bad" | "good"; label: string
 
 const BarRow = ({ label, value, tone, pct }: { label: string; value: string; tone: "bad" | "good"; pct: number }) => (
   <>
-    <div className="mb-1 mt-2.5 flex justify-between text-[14px]">
+    <div className="mb-0.5 mt-2 flex justify-between text-[12px]">
       <span className="text-muted-foreground">{label}</span>
       <span className={`font-bold ${tone === "bad" ? "text-destructive" : "text-success"}`}>{value}</span>
     </div>
-    <div className="h-2 overflow-hidden rounded-full bg-muted">
+    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
       <div
         className={`h-full rounded-full ${tone === "bad" ? "bg-destructive" : "bg-success"}`}
         style={{ width: `${pct}%` }}
