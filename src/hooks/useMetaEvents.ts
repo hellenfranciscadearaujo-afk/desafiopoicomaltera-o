@@ -35,8 +35,15 @@ function getMetaCookies(): { fbc: string; fbp: string } {
 }
 
 /** Dispara evento no Pixel do navegador */
+type FbqFn = (
+  method: string,
+  eventName: string,
+  params?: Record<string, unknown>,
+  options?: { eventID?: string }
+) => void;
+
 function firePixel(eventName: string, eventId: string, params: Record<string, unknown> = {}, isCustom = false) {
-  const fbq = (window as unknown as { fbq?: Function }).fbq;
+  const fbq = (window as unknown as { fbq?: FbqFn }).fbq;
   if (!fbq) return;
 
   const method = isCustom ? 'trackCustom' : 'track';

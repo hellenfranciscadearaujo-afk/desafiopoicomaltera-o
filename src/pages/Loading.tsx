@@ -112,7 +112,7 @@ const Loading = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _in
         <div className="w-full max-w-xs flex flex-col gap-2">
           {steps.map((step) => (
             <div key={step.label} className="flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all"
-              style={{ background: step.done ? "hsl(142,70%,38%,0.1)" : "hsl(var(--muted))", border: step.done ? "1px solid hsl(142,70%,38%,0.3)" : "1px solid hsl(var(--border))" }}>
+              style={{ background: step.done ? "hsla(142,70%,38%,0.1)" : "hsl(var(--muted))", border: step.done ? "1px solid hsla(142,70%,38%,0.3)" : "1px solid hsl(var(--border))" }}>
               <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all"
                 style={{ background: step.done ? "hsl(142,70%,38%)" : "hsl(var(--border))" }}>
                 {step.done

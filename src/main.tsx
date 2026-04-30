@@ -9,13 +9,29 @@ import slide3 from "@/assets/slideshow/slide-3.webp";
 import slide4 from "@/assets/slideshow/slide-4.webp";
 import logo from "@/assets/logo.png";
 
-// Remove o splash inline assim que o React começa a montar
-const splash = document.getElementById("initial-splash");
-if (splash) splash.remove();
-
 [slide1, slide2, slide3, slide4, logo].forEach((src) => {
   const img = new Image();
   img.src = src;
 });
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root");
+if (!rootEl) {
+  throw new Error("Elemento #root não encontrado no index.html");
+}
+
+// Renderiza o App primeiro
+createRoot(rootEl).render(<App />);
+
+// Some com o splash apenas DEPOIS que o React montou (próximo frame).
+// Como o splash agora é position:fixed FORA do #root, ele convive com
+// o React montando e some com fade quando ganha a classe `hidden`.
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    const splash = document.getElementById("initial-splash");
+    if (splash) {
+      splash.classList.add("hidden");
+      // Remove do DOM após o fade
+      setTimeout(() => splash.remove(), 400);
+    }
+  });
+});

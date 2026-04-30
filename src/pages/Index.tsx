@@ -1,10 +1,7 @@
 import { useMemo, useState } from "react";
 import { QuizShell } from "@/components/quiz/QuizShell";
-import quiz1 from "@/assets/quiz-1-sad.webp";
 import quiz3 from "@/assets/quiz-3-sit.webp";
 import quiz4 from "@/assets/quiz-4-walk.webp";
-import beforeImg from "@/assets/before.webp";
-import afterImg from "@/assets/after.webp";
 import logo from "@/assets/logo.png";
 import avatarJuliana from "@/assets/avatar-juliana.png";
 import avatarAna from "@/assets/avatar-ana.png";
@@ -712,14 +709,5 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
 
   return content;
 };
-
-const Row = ({ k, v, highlight }: { k: string; v: string; highlight?: boolean }) => (
-  <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-2 last:border-0 last:pb-0">
-    <span className="text-muted-foreground">{k}</span>
-    <span className={`font-bold text-right ${highlight ? "italic text-primary" : "text-foreground"}`}>
-      {v}
-    </span>
-  </div>
-);
 
 export default Index;

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3, CheckCircle2 } from "lucide-react";
+import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3 } from "lucide-react";
 import beforeImg from "@/assets/before.webp";
 import afterImg from "@/assets/after.webp";
 
@@ -297,7 +296,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Preço + CTA (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} />
         <Guarantee />
       </Section>
 
@@ -342,7 +341,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Preço 2 (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} />
         <Guarantee />
       </Section>
 
@@ -431,14 +430,7 @@ const BarRow = ({ label, value, tone, pct }: { label: string; value: string; ton
   </>
 );
 
-const DRow = ({ k, v, hot }: { k: string; v: string; hot?: boolean }) => (
-  <div className="flex items-center justify-between border-b border-border/50 py-2.5 last:border-0">
-    <span className="text-[14px] text-muted-foreground">{k}</span>
-    <span className={`text-[14px] font-semibold ${hot ? "italic text-primary" : "text-foreground"}`}>{v}</span>
-  </div>
-);
-
-const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; coupon: string; mm: string; ss: string; dogName: string }) => (
+const OfferCard = ({ ctaLabel, coupon, mm, ss }: { ctaLabel: string; coupon: string; mm: string; ss: string }) => (
   <div
     className="relative mb-3 rounded-2xl border-2"
     style={{
@@ -521,20 +513,6 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
         <span>Acesso imediato</span>
       </div>
     </div>
-  </div>
-);
-
-const PriceBlock = () => (
-  <div className="mb-3 rounded-2xl border border-border bg-muted/20 p-4 text-center">
-    <p className="mb-1 text-[14px] font-bold uppercase tracking-widest text-muted-foreground">
-      Oferta especial de hoje
-    </p>
-    <p className="text-[14px] font-medium text-muted-foreground line-through">De R$ 118,00</p>
-    <p className="my-1 text-[32px] font-extrabold leading-none text-success">R$ 37,90</p>
-    <p className="text-[14px] text-muted-foreground">Pagamento único · Acesso vitalício</p>
-    <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-[14px] font-bold text-success">
-      <Check className="h-3.5 w-3.5" /> Economia de R$ 80 — 68% off
-    </span>
   </div>
 );
 
