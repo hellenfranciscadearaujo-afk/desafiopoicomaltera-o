@@ -558,8 +558,9 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
               </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto px-5 pb-4">
-              <div className="flex flex-col gap-3 py-2">
+            {/* quiz-body já compensa header e footer fixos via padding */}
+            <main className="quiz-body">
+              <div className="flex flex-col gap-3">
 
                 {/* Headline */}
                 <div className="flex flex-col gap-1">

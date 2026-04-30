@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import logo from "@/assets/logo.png";
+import { getDogGender, articleDe } from "@/lib/dogGender";
 
 interface GiftState {
   dogName?: string;
@@ -26,6 +27,9 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
   const s = _initialState as GiftState;
   const dogName = s.dogName?.trim() || "seu cão";
   const hasName = !!s.dogName?.trim();
+  const dogG = hasName ? getDogGender(s.dogName) : "m";
+  const _do = articleDe(dogG); // "do" ou "da" — reservado para uso futuro
+  void _do;
 
   // Cupom: POI68 + 4 primeiras letras do nome em maiúsculo (ou POI68 sozinho se vazio)
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
@@ -59,17 +63,27 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
 
           {/* Bloco de textos — headline e subheadline com altura mínima fixa para
               o presente não subir e cobrir os textos quando o estado muda. */}
-          <div className="flex flex-col items-center px-1" style={{ minHeight: "92px" }}>
-            <h1 className="text-[17px] font-bold leading-tight text-foreground">
+          <div className="flex flex-col items-center px-2" style={{ minHeight: "104px" }}>
+            <h1 className="text-[18px] font-extrabold leading-tight text-foreground tracking-tight">
               {opened ? (
-                <>Você recebeu um presente exclusivo!!</>
-              ) : hasName ? (
-                <>Por ter chegado até aqui, separamos um presente especial para <span className="text-highlight">{dogName}</span></>
+                <>
+                  <span className="text-highlight">Parabéns!</span>{" "}
+                  Você recebeu um presente exclusivo
+                  {hasName ? (
+                    <> para <span className="text-highlight">{dogName}</span></>
+                  ) : (
+                    <> para você</>
+                  )}
+                </>
               ) : (
-                <>Por ter chegado até aqui, separamos um presente especial para você</>
+                <>
+                  Por você ter chegado até aqui,{" "}
+                  <span className="text-highlight">separamos um presente especial</span>{" "}
+                  para você.
+                </>
               )}
             </h1>
-            <p className="text-[13px] leading-relaxed text-muted-foreground mt-1.5">
+            <p className="text-[13px] leading-relaxed text-muted-foreground mt-2">
               {opened ? "Aqui está o seu presente." : "Clique aqui e garanta o seu presente."}
             </p>
           </div>

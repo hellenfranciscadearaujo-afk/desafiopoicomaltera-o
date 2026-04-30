@@ -3,6 +3,10 @@ import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChar
 import beforeImg from "@/assets/before.webp";
 import afterImg from "@/assets/after.webp";
 import { getDogGender, article, articleDe } from "@/lib/dogGender";
+import { useMetaEvents } from "@/hooks/useMetaEvents";
+import OfferSummaryModal from "@/components/OfferSummaryModal";
+
+const CHECKOUT_URL = "https://pagamento.desafiopoi21dais.shop/checkout/v5/JJu2MWXXZXKnPDHywq3d";
 
 interface OfferState {
   dogName?: string;
@@ -100,6 +104,16 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   }, [s.challenges, challengeToGoal]);
 
   const [seconds, setSeconds] = useState(10 * 60);
+
+  // Modal de resumo da oferta — abre ao clicar nos CTAs
+  const [modalOpen, setModalOpen] = useState(false);
+  const { trackOpenOfferModal } = useMetaEvents();
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+    trackOpenOfferModal();
+  };
+  const handleCloseModal = () => setModalOpen(false);
 
 
   useEffect(() => {
@@ -327,7 +341,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Preço + CTA (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} onCTAClick={handleOpenModal} />
         <Guarantee />
       </Section>
 
@@ -372,7 +386,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Preço 2 (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} onCTAClick={handleOpenModal} />
         <Guarantee />
       </Section>
 
@@ -406,7 +420,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* CTA final */}
       <Section last>
-        <CTA label={ctaLabel} />
+        <CTA label={ctaLabel} onClick={handleOpenModal} />
         <p className="text-center text-[14px] text-muted-foreground">
           Garantia de 7 dias · Acesso imediato
         </p>
@@ -417,6 +431,17 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
           Refazer diagnóstico
         </a>
       </div>
+
+      {/* Modal Resumo da Oferta — sobe de baixo ao clicar nos CTAs */}
+      <OfferSummaryModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        checkoutUrl={CHECKOUT_URL}
+        dogName={dogName}
+        artDe={_do}
+        coupon={coupon}
+        timer={`${mm}:${ss}`}
+      />
     </div>
   );
 };
@@ -461,7 +486,7 @@ const BarRow = ({ label, value, tone, pct }: { label: string; value: string; ton
   </>
 );
 
-const OfferCard = ({ ctaLabel, coupon, mm, ss }: { ctaLabel: string; coupon: string; mm: string; ss: string }) => (
+const OfferCard = ({ ctaLabel, coupon, mm, ss, onCTAClick }: { ctaLabel: string; coupon: string; mm: string; ss: string; onCTAClick: () => void }) => (
   <div
     className="relative mb-3 rounded-2xl border-2"
     style={{
@@ -516,17 +541,18 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss }: { ctaLabel: string; coupon: str
         </div>
       </div>
 
-      {/* CTA dentro do card */}
-      <a
-        href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
-        className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline"
+      {/* CTA dentro do card — abre modal de resumo da oferta */}
+      <button
+        type="button"
+        onClick={onCTAClick}
+        className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline border-0 cursor-pointer"
         style={{
           background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
           boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
         }}
       >
         {ctaLabel}
-      </a>
+      </button>
     </div>
 
     {/* Selos */}
@@ -547,11 +573,12 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss }: { ctaLabel: string; coupon: str
   </div>
 );
 
-const CTA = ({ label }: { label: string }) => (
-  <a
-    href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
-    className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline"
-  >{label}</a>
+const CTA = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline w-full border-0 cursor-pointer"
+  >{label}</button>
 );
 
 const Guarantee = () => (

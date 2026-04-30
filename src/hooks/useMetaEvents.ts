@@ -6,10 +6,11 @@
  * 2. Envia via CAPI no servidor (mesmo event_id)
  * 
  * Eventos implementados:
- * - PageView    → entrada no site
- * - QuizStart   → clique no 1º CTA
- * - QuizProgress → chegou no diagnóstico
- * - Lead        → conclusão do quiz (chegou na oferta)
+ * - PageView         → entrada no site
+ * - QuizStart        → clique no 1º CTA
+ * - QuizProgress     → chegou no diagnóstico
+ * - Lead             → conclusão do quiz (chegou na oferta)
+ * - OpenOfferModal   → clique no CTA da oferta (abre modal de resumo)
  */
 
 import { useCallback, useRef } from 'react';
@@ -132,5 +133,12 @@ export function useMetaEvents() {
         value: 0,
         currency: 'BRL',
       }),
+
+    /** OpenOfferModal — clique no CTA da página de oferta (abre modal de resumo) */
+    trackOpenOfferModal: () =>
+      trackOnce('OpenOfferModal', 'OpenOfferModal', {
+        content_name: 'Modal Resumo Oferta',
+        engagement_level: 'Muito Alto',
+      }, true),
   };
 }
