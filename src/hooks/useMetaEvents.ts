@@ -6,10 +6,11 @@
  * 2. Envia via CAPI no servidor (mesmo event_id)
  * 
  * Eventos implementados:
- * - PageView    → entrada no site
- * - QuizStart   → clique no 1º CTA
- * - QuizProgress → chegou no diagnóstico
- * - Lead        → conclusão do quiz (chegou na oferta)
+ * - PageView           → entrada no site
+ * - IniciouDesafio     → clique no 1º CTA
+ * - AvancouDiagnostico → chegou no diagnóstico
+ * - Lead               → conclusão do quiz (chegou na oferta)
+ * - OpenOfferModal     → clique no CTA da oferta (abre modal de resumo)
  */
 
 import { useCallback, useRef } from 'react';
@@ -35,8 +36,15 @@ function getMetaCookies(): { fbc: string; fbp: string } {
 }
 
 /** Dispara evento no Pixel do navegador */
+type FbqFn = (
+  method: string,
+  eventName: string,
+  params?: Record<string, unknown>,
+  options?: { eventID?: string }
+) => void;
+
 function firePixel(eventName: string, eventId: string, params: Record<string, unknown> = {}, isCustom = false) {
-  const fbq = (window as unknown as { fbq?: Function }).fbq;
+  const fbq = (window as unknown as { fbq?: FbqFn }).fbq;
   if (!fbq) return;
 
   const method = isCustom ? 'trackCustom' : 'track';
@@ -104,16 +112,16 @@ export function useMetaEvents() {
     trackPageView: () =>
       trackOnce('PageView', 'PageView'),
 
-    /** QuizStart — clique no 1º CTA */
-    trackQuizStart: () =>
-      trackOnce('QuizStart', 'QuizStart', {
+    /** IniciouDesafio — clique no 1º CTA */
+    trackIniciouDesafio: () =>
+      trackOnce('IniciouDesafio', 'IniciouDesafio', {
         content_name: 'Desafio POI 21 Days',
         status: 'Iniciado',
       }, true),
 
-    /** QuizProgress — chegou na área de diagnóstico */
-    trackQuizProgress: () =>
-      trackOnce('QuizProgress', 'QuizProgress', {
+    /** AvancouDiagnostico — chegou na área de diagnóstico */
+    trackAvancouDiagnostico: () =>
+      trackOnce('AvancouDiagnostico', 'AvancouDiagnostico', {
         step: 'Diagnostico',
         engagement_level: 'Alto',
       }, true),
@@ -125,5 +133,12 @@ export function useMetaEvents() {
         value: 0,
         currency: 'BRL',
       }),
+
+    /** OpenOfferModal — clique no CTA da página de oferta (abre modal de resumo) */
+    trackOpenOfferModal: () =>
+      trackOnce('OpenOfferModal', 'OpenOfferModal', {
+        content_name: 'Modal Resumo Oferta',
+        engagement_level: 'Muito Alto',
+      }, true),
   };
 }

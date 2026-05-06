@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
 import { QuizShell } from "@/components/quiz/QuizShell";
-import quiz1 from "@/assets/quiz-1-sad.webp";
+import { getDogGender, articleDe } from "@/lib/dogGender";
 import quiz3 from "@/assets/quiz-3-sit.webp";
 import quiz4 from "@/assets/quiz-4-walk.webp";
-import beforeImg from "@/assets/before.webp";
-import afterImg from "@/assets/after.webp";
 import logo from "@/assets/logo.png";
 import avatarJuliana from "@/assets/avatar-juliana.png";
 import avatarAna from "@/assets/avatar-ana.png";
@@ -78,11 +76,16 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
     setA((p) => ({ ...p, [k]: v }));
 
   const dogName = a.dogName.trim() || "seu cão";
+  // Gênero do nome real (só usado quando o usuário digitou um nome).
+  // Se não digitou, mantemos o masculino padrão ("o seu cão").
+  const hasName = !!a.dogName.trim();
+  const dogG = hasName ? getDogGender(a.dogName) : "m";
+  const _do = articleDe(dogG); // "do" ou "da"
 
   // Mapa de comportamentos para headlines/subheadlines dinâmicas (passo 2)
   const challengeContent: Record<string, { h: string; s: string }> = {
     "Morde mãos, pés ou objetos o tempo todo.": {
-      h: "Pelas suas respostas, seu cão está mordendo com frequência",
+      h: "Seu cão está mordendo com frequência.",
       s: "Morder mãos, pés ou objetos não é só energia — é instinto mal direcionado. Quando ele não sabe onde descarregar isso, acaba mordendo tudo.",
     },
     "Destrói objetos em casa quando fica sozinho.": {
@@ -116,7 +119,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
     const count = a.challenges.length;
     if (count >= 3) {
       return {
-        h: "Isso já virou um padrão de comportamento",
+        h: "Os problemas já estão acumulados",
         s: "Quando vários problemas aparecem ao mesmo tempo, seu cão não está reagindo por acaso — ele está seguindo um padrão sem controle.",
       };
     }
@@ -405,7 +408,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             step={6}
             totalSteps={TOTAL}
             onBack={back}
-            headline={`Qual a raça do ${dogName}?`}
+            headline={`Qual a raça ${_do} ${dogName}?`}
             subheadline="Esses detalhes ajudam a traçar o perfil ideal para o Protocolo POI."
             footer={
               <button
@@ -442,7 +445,7 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
             step={7}
             totalSteps={TOTAL}
             onBack={back}
-            headline={`Qual o nível de obediência do ${dogName} hoje?`}
+            headline={`Qual o nível de obediência ${_do} ${dogName} hoje?`}
             subheadline="Não se preocupe — estamos aqui para ajudar a transformá-lo!"
             footer={
               <button
@@ -555,8 +558,9 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
               </div>
             </header>
 
-            <main className="flex-1 overflow-y-auto px-5 pb-4">
-              <div className="flex flex-col gap-3 py-2">
+            {/* quiz-body já compensa header e footer fixos via padding */}
+            <main className="quiz-body">
+              <div className="flex flex-col gap-3">
 
                 {/* Headline */}
                 <div className="flex flex-col gap-1">
@@ -712,14 +716,5 @@ const Index = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _init
 
   return content;
 };
-
-const Row = ({ k, v, highlight }: { k: string; v: string; highlight?: boolean }) => (
-  <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-2 last:border-0 last:pb-0">
-    <span className="text-muted-foreground">{k}</span>
-    <span className={`font-bold text-right ${highlight ? "italic text-primary" : "text-foreground"}`}>
-      {v}
-    </span>
-  </div>
-);
 
 export default Index;

@@ -37,7 +37,7 @@ export interface QuizData {
 function FunnelOrchestrator() {
   const [stage, setStage] = useState<FunnelStage>("home");
   const [quizData, setQuizData] = useState<QuizData>({});
-  const { trackPageView, trackQuizStart, trackQuizProgress, trackLead } = useMetaEvents();
+  const { trackPageView, trackIniciouDesafio, trackAvancouDiagnostico, trackLead } = useMetaEvents();
 
   useEffect(() => {
     trackPageView();
@@ -49,7 +49,7 @@ function FunnelOrchestrator() {
 
   // Sempre que mudar de página (stage), volta ao topo
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [stage]);
 
   const navigate = (to: string, opts?: { state?: QuizData; replace?: boolean }) => {
@@ -60,12 +60,12 @@ function FunnelOrchestrator() {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 
     if (to === "/" || to === "/quiz") {
-      if (stage === "home") trackQuizStart();
+      if (stage === "home") trackIniciouDesafio();
       setStage("quiz");
     } else if (to === "/carregando") {
       setStage("loading");
     } else if (to === "/diagnostico") {
-      trackQuizProgress();
+      trackAvancouDiagnostico();
       setStage("diagnosis");
     } else if (to === "/presente") {
       setStage("gift");

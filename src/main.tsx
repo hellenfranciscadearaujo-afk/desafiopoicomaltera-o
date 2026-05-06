@@ -2,11 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Remove o splash inline assim que o React começa a montar
-const splash = document.getElementById("initial-splash");
-if (splash) splash.remove();
-
-// Pré-carrega APENAS as imagens da Home (slideshow + logo)
+// Pré-carrega imagens da Home
 import slide1 from "@/assets/slideshow/slide-1.webp";
 import slide2 from "@/assets/slideshow/slide-2.webp";
 import slide3 from "@/assets/slideshow/slide-3.webp";
@@ -18,4 +14,24 @@ import logo from "@/assets/logo.png";
   img.src = src;
 });
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootEl = document.getElementById("root");
+if (!rootEl) {
+  throw new Error("Elemento #root não encontrado no index.html");
+}
+
+// Renderiza o App primeiro
+createRoot(rootEl).render(<App />);
+
+// Some com o splash apenas DEPOIS que o React montou (próximo frame).
+// Como o splash agora é position:fixed FORA do #root, ele convive com
+// o React montando e some com fade quando ganha a classe `hidden`.
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    const splash = document.getElementById("initial-splash");
+    if (splash) {
+      splash.classList.add("hidden");
+      // Remove do DOM após o fade
+      setTimeout(() => splash.remove(), 400);
+    }
+  });
+});

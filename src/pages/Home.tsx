@@ -4,7 +4,7 @@
  * Header (logo + barra) e footer (barra/botão) FIXOS via position:fixed
  * — não se movem em nenhum dispositivo.
  *
- * Pixel: QuizStart dispara no clique do botão (via App.tsx).
+ * Pixel: IniciouDesafio dispara no clique do botão (via App.tsx).
  */
 
 import { useEffect, useRef, useState } from "react";
@@ -97,7 +97,7 @@ const Home = ({ _navigate }: { _navigate: NavigateFn }) => {
       <main className="quiz-body items-center justify-start text-center">
         {/* Headline com palavras em azul */}
         <h1 className="text-[20px] font-extrabold leading-tight text-foreground mt-3">
-          Receba um <span className="text-primary">desafio de obediência personalizado</span> para o <span className="text-primary">seu cão</span>
+          Receba um <span className="text-highlight">desafio de obediência personalizado</span> para o <span className="text-highlight">seu cão</span>
         </h1>
 
         {/* Subheadline */}

@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3, CheckCircle2 } from "lucide-react";
+import { Check, ShieldCheck, Gift, Plus, Minus, Zap, PawPrint, Calendar, BarChart3 } from "lucide-react";
 import beforeImg from "@/assets/before.webp";
 import afterImg from "@/assets/after.webp";
+import { getDogGender, article, articleDe } from "@/lib/dogGender";
+import { useMetaEvents } from "@/hooks/useMetaEvents";
+import OfferSummaryModal from "@/components/OfferSummaryModal";
+
+const CHECKOUT_URL = "https://pagamento.desafiopoi21dais.shop/checkout/v5/JJu2MWXXZXKnPDHywq3d";
 
 interface OfferState {
   dogName?: string;
@@ -15,24 +19,101 @@ interface OfferState {
 const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const s = _initialState as OfferState;
   const dogName = s.dogName?.trim() || "seu cão";
-  // Cupom igual ao da página Gift: POI68 + 4 primeiras letras do nome
+  const hasName = !!s.dogName?.trim();
+  const dogG = hasName ? getDogGender(s.dogName) : "m";
+  const _o = article(dogG);    // "o" ou "a"
+  const _do = articleDe(dogG); // "do" ou "da"
+  // Cupom igual ao da página Gift: POI61 + 4 primeiras letras do nome
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
-  const coupon = `POI68${couponSuffix}`;
+  const coupon = `POI61${couponSuffix}`;
   const breed = s.breed || "—";
   const age = s.age || "—";
   const level = s.level || 3;
 
-  const goal = useMemo(() => {
-    const ch = s.challenges || [];
-    if (ch.some((c) => c.toLowerCase().includes("late"))) return "Modulação de Reatividade e Latidos";
-    if (ch.some((c) => c.toLowerCase().includes("puxa"))) return "Controle de Guia e Passeios";
-    if (ch.some((c) => c.toLowerCase().includes("destrói"))) return "Ansiedade e Foco em Casa";
-    if (ch.some((c) => c.toLowerCase().includes("ignora"))) return "Atenção e Comandos Básicos";
-    if (ch.some((c) => c.toLowerCase().includes("necessidades"))) return "Treino de Higiene e Rotina";
-    return "Obediência POI Personalizada";
-  }, [s.challenges]);
+  // Mapa challenge -> Objetivo (idêntico ao usado em Diagnosis.tsx).
+  // Mantemos as duas páginas em sincronia para que o objetivo mostrado na
+  // página de oferta seja exatamente o mesmo que aparece no diagnóstico.
+  const challengeToGoal: Record<string, { title: string; desc: string }> = useMemo(() => ({
+    "Ignora completamente quando eu chamo.": {
+      title: "Atenção e Comandos Básicos",
+      desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+    },
+    "Não obedece comandos básicos.": {
+      title: "Atenção e Comandos Básicos",
+      desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto.",
+    },
+    "Late excessivamente para visitas ou outros cães.": {
+      title: "Modulação de Reatividade",
+      desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+    },
+    "Rosna ou demonstra agressividade.": {
+      title: "Modulação de Reatividade",
+      desc: "Reduzir reações excessivas e ensinar controle diante de estímulos.",
+    },
+    "Destrói objetos em casa quando fica sozinho.": {
+      title: "Ansiedade e Comportamento em Casa",
+      desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+    },
+    "Morde mãos, pés ou objetos o tempo todo.": {
+      title: "Ansiedade e Comportamento em Casa",
+      desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa.",
+    },
+    "Faz as necessidades no lugar errado.": {
+      title: "Treino de Higiene",
+      desc: "Ensinar o local correto e criar consistência no comportamento.",
+    },
+  }), []);
+
+  // Objetivo (idêntico à lógica do Diagnosis):
+  // - 0 challenges  -> texto genérico
+  // - 1 challenge   -> título + descrição daquele comportamento
+  // - 2+ challenges -> "Seu plano vai corrigir: X, Y e Z" + subheadline padrão
+  const goalContent = useMemo(() => {
+    const challenges = s.challenges || [];
+    if (challenges.length === 0) {
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
+    }
+    if (challenges.length === 1) {
+      const g = challengeToGoal[challenges[0]];
+      if (g) return { h: g.title, s: g.desc };
+      return {
+        h: "Obediência POI Personalizada",
+        s: "O desafio será montado com base nas suas respostas.",
+      };
+    }
+    const map: Record<string, string> = {
+      "Morde mãos, pés ou objetos o tempo todo.": "morder",
+      "Destrói objetos em casa quando fica sozinho.": "destruir",
+      "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
+      "Late excessivamente para visitas ou outros cães.": "latir",
+      "Ignora completamente quando eu chamo.": "ignorar comandos",
+      "Rosna ou demonstra agressividade.": "agressividade",
+      "Não obedece comandos básicos.": "não obedecer",
+    };
+    const items = challenges.map((c) => map[c]).filter(Boolean);
+    let listStr = "";
+    if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
+    else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
+    return {
+      h: `Seu plano vai corrigir: ${listStr}`,
+      s: "O desafio vai reorganizar o instinto do seu cão, criando controle e respostas consistentes em todas essas situações.",
+    };
+  }, [s.challenges, challengeToGoal]);
 
   const [seconds, setSeconds] = useState(10 * 60);
+
+  // Modal de resumo da oferta — abre ao clicar nos CTAs
+  const [modalOpen, setModalOpen] = useState(false);
+  const { trackOpenOfferModal } = useMetaEvents();
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+    trackOpenOfferModal();
+  };
+  const handleCloseModal = () => setModalOpen(false);
 
 
   useEffect(() => {
@@ -69,24 +150,24 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
         </div>
       </div>
 
-      {/* Hero — Parabéns + Presente resgatado */}
+      {/* Hero — Parabéns + Presente resgatado (compacto) */}
       <Section>
-        <div className="grid grid-cols-[1.4fr_1fr] gap-3 items-center">
+        <div className="grid grid-cols-[1.4fr_1fr] gap-2 items-center">
           {/* Coluna esquerda: parabéns */}
           <div>
-            <div className="flex items-start gap-2 mb-1.5">
-              <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "hsl(142,70%,38%)" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div className="flex items-start gap-1.5 mb-1">
+              <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full mt-0.5" style={{ background: "hsl(142,70%,38%)" }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
-              <h1 className="text-[19px] font-extrabold leading-tight text-foreground">
+              <h1 className="text-[16px] font-extrabold leading-tight text-foreground">
                 Parabéns, {dogName}!
               </h1>
             </div>
-            <h2 className="text-[18px] font-extrabold leading-tight text-foreground mb-2">
+            <h2 className="text-[15px] font-extrabold leading-tight text-foreground mb-1.5">
               Seu desafio está pronto
             </h2>
-            <p className="text-[12px] leading-relaxed text-muted-foreground">
-              Com base nas suas respostas, criamos um plano personalizado para transformar o {dogName}.
+            <p className="text-[11px] leading-snug text-muted-foreground">
+              Com base nas suas respostas, criamos um plano personalizado para transformar {_o} {dogName}.
             </p>
           </div>
 
@@ -195,13 +276,13 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Resumo do diagnóstico — espelha a página de Diagnóstico (compacto) */}
       <Section>
-        <div className="rounded-2xl border border-border bg-card p-3 shadow-sm">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="rounded-2xl border border-border bg-card p-2.5 shadow-sm">
+          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             📋 Resumo do diagnóstico
           </p>
 
           {/* Linha 1: Raça + Idade + Nível X/5 */}
-          <div className="grid grid-cols-3 gap-2 mb-2.5">
+          <div className="grid grid-cols-3 gap-1.5 mb-1.5">
             <div className="flex items-center gap-1.5">
               <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent">
                 <PawPrint className="h-3.5 w-3.5 text-primary" />
@@ -231,12 +312,12 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
             </div>
           </div>
 
-          {/* Linha 2: Bolinhas */}
-          <div className="flex items-center gap-1.5 mb-2.5 px-1">
+          {/* Linha 2: Bolinhas mais finas */}
+          <div className="flex items-center gap-1 mb-2 px-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
-                className="h-2 flex-1 rounded-full"
+                className="h-1 flex-1 rounded-full"
                 style={{
                   background: n <= level ? "hsl(218,80%,42%)" : "hsl(var(--muted))",
                 }}
@@ -247,57 +328,20 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
           {/* Linha 3: Objetivo (igual ao Diagnóstico) */}
           <div className="border-t border-border pt-2">
             <p className="text-[10px] font-bold text-muted-foreground mb-1">Objetivo:</p>
-            {(() => {
-              const ch = s.challenges || [];
-              const map: Record<string, { title: string; desc: string }> = {
-                "Ignora completamente quando eu chamo.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
-                "Não obedece comandos básicos.": { title: "Atenção e Comandos Básicos", desc: "Reforçar atenção e resposta ao comando, ativando o instinto correto." },
-                "Late excessivamente para visitas ou outros cães.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
-                "Rosna ou demonstra agressividade.": { title: "Modulação de Reatividade", desc: "Reduzir reações excessivas e ensinar controle diante de estímulos." },
-                "Destrói objetos em casa quando fica sozinho.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
-                "Morde mãos, pés ou objetos o tempo todo.": { title: "Ansiedade e Comportamento em Casa", desc: "Diminuir ansiedade e redirecionar o comportamento dentro de casa." },
-                "Faz as necessidades no lugar errado.": { title: "Treino de Higiene", desc: "Ensinar o local correto e criar consistência no comportamento." },
-              };
-              if (ch.length === 1 && map[ch[0]]) {
-                return (
-                  <p className="text-[12px] font-bold text-foreground leading-snug">
-                    Treino de {map[ch[0]].title}
-                  </p>
-                );
-              }
-              if (ch.length >= 2) {
-                const labels: Record<string, string> = {
-                  "Morde mãos, pés ou objetos o tempo todo.": "morder",
-                  "Destrói objetos em casa quando fica sozinho.": "destruir",
-                  "Faz as necessidades no lugar errado.": "necessidades no lugar errado",
-                  "Late excessivamente para visitas ou outros cães.": "latir",
-                  "Ignora completamente quando eu chamo.": "ignorar comandos",
-                  "Rosna ou demonstra agressividade.": "agressividade",
-                  "Não obedece comandos básicos.": "não obedecer",
-                };
-                const items = ch.map((c) => labels[c]).filter(Boolean);
-                let listStr = "";
-                if (items.length === 2) listStr = `${items[0]} e ${items[1]}`;
-                else listStr = items.slice(0, -1).join(", ") + " e " + items[items.length - 1];
-                return (
-                  <p className="text-[12px] font-bold text-foreground leading-snug">
-                    Corrigir: {listStr}
-                  </p>
-                );
-              }
-              return (
-                <p className="text-[12px] font-bold text-foreground leading-snug">
-                  Obediência POI Personalizada
-                </p>
-              );
-            })()}
+            {/* Mostra exatamente o mesmo conteúdo do card "Objetivo" da página de Diagnóstico */}
+            <p className="text-[12px] font-bold text-foreground leading-snug">
+              {goalContent.h}
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+              {goalContent.s}
+            </p>
           </div>
         </div>
       </Section>
 
       {/* Preço + CTA (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} onCTAClick={handleOpenModal} />
         <Guarantee />
       </Section>
 
@@ -305,7 +349,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
       <Section>
         <div className="rounded-2xl border-l-4 border-primary bg-accent/60 p-4">
           <p className="mb-2 text-[14px] font-bold text-primary">
-            A culpa não é sua (e nem do {dogName})
+            A culpa não é sua (e nem {_do} {dogName})
           </p>
           <p className="text-[14px] leading-relaxed text-foreground/80">
             Os problemas que você enfrenta são reflexos de métodos tradicionais que tentam "humanizar" o cão. Gritos e punições não funcionam porque ignoram o que realmente move um cachorro:{" "}
@@ -342,7 +386,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* Preço 2 (card laranja unificado) */}
       <Section>
-        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} dogName={dogName} />
+        <OfferCard ctaLabel={ctaLabel} coupon={coupon} mm={mm} ss={ss} onCTAClick={handleOpenModal} />
         <Guarantee />
       </Section>
 
@@ -376,7 +420,7 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
 
       {/* CTA final */}
       <Section last>
-        <CTA label={ctaLabel} />
+        <CTA label={ctaLabel} onClick={handleOpenModal} />
         <p className="text-center text-[14px] text-muted-foreground">
           Garantia de 7 dias · Acesso imediato
         </p>
@@ -387,6 +431,17 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
           Refazer diagnóstico
         </a>
       </div>
+
+      {/* Modal Resumo da Oferta — sobe de baixo ao clicar nos CTAs */}
+      <OfferSummaryModal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        checkoutUrl={CHECKOUT_URL}
+        dogName={dogName}
+        artDe={_do}
+        coupon={coupon}
+        timer={`${mm}:${ss}`}
+      />
     </div>
   );
 };
@@ -418,11 +473,11 @@ const BACard = ({ tone, label, img, alt }: { tone: "bad" | "good"; label: string
 
 const BarRow = ({ label, value, tone, pct }: { label: string; value: string; tone: "bad" | "good"; pct: number }) => (
   <>
-    <div className="mb-1 mt-2.5 flex justify-between text-[14px]">
+    <div className="mb-0.5 mt-2 flex justify-between text-[12px]">
       <span className="text-muted-foreground">{label}</span>
       <span className={`font-bold ${tone === "bad" ? "text-destructive" : "text-success"}`}>{value}</span>
     </div>
-    <div className="h-2 overflow-hidden rounded-full bg-muted">
+    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
       <div
         className={`h-full rounded-full ${tone === "bad" ? "bg-destructive" : "bg-success"}`}
         style={{ width: `${pct}%` }}
@@ -431,14 +486,7 @@ const BarRow = ({ label, value, tone, pct }: { label: string; value: string; ton
   </>
 );
 
-const DRow = ({ k, v, hot }: { k: string; v: string; hot?: boolean }) => (
-  <div className="flex items-center justify-between border-b border-border/50 py-2.5 last:border-0">
-    <span className="text-[14px] text-muted-foreground">{k}</span>
-    <span className={`text-[14px] font-semibold ${hot ? "italic text-primary" : "text-foreground"}`}>{v}</span>
-  </div>
-);
-
-const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; coupon: string; mm: string; ss: string; dogName: string }) => (
+const OfferCard = ({ ctaLabel, coupon, mm, ss, onCTAClick }: { ctaLabel: string; coupon: string; mm: string; ss: string; onCTAClick: () => void }) => (
   <div
     className="relative mb-3 rounded-2xl border-2"
     style={{
@@ -447,7 +495,7 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
       boxShadow: "0 8px 24px rgba(245,158,11,0.18)",
     }}
   >
-    {/* Topo — timer + cupom + 68% (com overflow hidden só na faixa colorida) */}
+    {/* Topo — timer + cupom + 61% (com overflow hidden só na faixa colorida) */}
     <div
       className="flex items-center justify-center gap-1.5 px-3 py-2 text-white text-[12px] font-extrabold flex-wrap rounded-t-xl"
       style={{
@@ -460,12 +508,12 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
       <span style={{ opacity: 0.7 }}>·</span>
       <span className="tracking-widest">{coupon}</span>
       <span style={{ opacity: 0.7 }}>·</span>
-      <span>68% DE DESCONTO</span>
+      <span>61% DE DESCONTO</span>
     </div>
 
     {/* Corpo — 2 colunas (preço) */}
     <div className="relative px-4 pt-4 pb-3">
-      {/* Selo 68% OFF circular — flutuante acima do card, sem sobrepor preços */}
+      {/* Selo 61% OFF circular — flutuante acima do card, sem sobrepor preços */}
       <div
         className="absolute flex h-14 w-14 items-center justify-center rounded-full text-white text-[11px] font-extrabold leading-tight text-center"
         style={{
@@ -477,33 +525,34 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
           zIndex: 2,
         }}
       >
-        68%<br />OFF
+        61%<br />OFF
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <div className="text-center">
           <p className="text-[12px] font-medium text-muted-foreground mb-1">De:</p>
-          <p className="text-[18px] font-bold text-muted-foreground line-through">R$ 118,00</p>
+          <p className="text-[18px] font-bold text-muted-foreground line-through">R$ 150,00</p>
         </div>
         <div className="text-center">
           <p className="text-[12px] font-medium text-muted-foreground mb-1">Por apenas:</p>
           <p className="text-[24px] font-extrabold leading-none" style={{ color: "hsl(142,70%,38%)" }}>
-            R$ 37,90
+            R$ 57,90
           </p>
         </div>
       </div>
 
-      {/* CTA dentro do card */}
-      <a
-        href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
-        className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline"
+      {/* CTA dentro do card — abre modal de resumo da oferta */}
+      <button
+        type="button"
+        onClick={onCTAClick}
+        className="mt-3 block w-full rounded-full py-3 text-center text-[14px] font-bold text-white no-underline border-0 cursor-pointer"
         style={{
           background: "linear-gradient(135deg, hsl(142,70%,38%) 0%, hsl(140,75%,32%) 100%)",
           boxShadow: "0 6px 20px rgba(34,197,94,0.35)",
         }}
       >
         {ctaLabel}
-      </a>
+      </button>
     </div>
 
     {/* Selos */}
@@ -524,25 +573,12 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, dogName }: { ctaLabel: string; co
   </div>
 );
 
-const PriceBlock = () => (
-  <div className="mb-3 rounded-2xl border border-border bg-muted/20 p-4 text-center">
-    <p className="mb-1 text-[14px] font-bold uppercase tracking-widest text-muted-foreground">
-      Oferta especial de hoje
-    </p>
-    <p className="text-[14px] font-medium text-muted-foreground line-through">De R$ 118,00</p>
-    <p className="my-1 text-[32px] font-extrabold leading-none text-success">R$ 37,90</p>
-    <p className="text-[14px] text-muted-foreground">Pagamento único · Acesso vitalício</p>
-    <span className="mt-2 inline-flex items-center gap-1 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-[14px] font-bold text-success">
-      <Check className="h-3.5 w-3.5" /> Economia de R$ 80 — 68% off
-    </span>
-  </div>
-);
-
-const CTA = ({ label }: { label: string }) => (
-  <a
-    href="https://pagar.desafiopoi21dais.shop/checkout/v4/EpF3xss3IQLLcBfcFcD3"
-    className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline"
-  >{label}</a>
+const CTA = ({ label, onClick }: { label: string; onClick: () => void }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="cta-success mb-2 py-3.5 text-[14px] block text-center no-underline w-full border-0 cursor-pointer"
+  >{label}</button>
 );
 
 const Guarantee = () => (

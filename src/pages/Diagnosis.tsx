@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, User, PawPrint, Calendar, BarChart3, Search, TrendingUp, Shield, CheckCircle2, Lock } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { HighlightInstinto } from "@/components/HighlightInstinto";
+import { getDogGender, articleDe } from "@/lib/dogGender";
 
 interface DiagState {
   dogName?: string;
@@ -59,6 +60,9 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
   const navigate = _navigate;
   const s = _initialState as DiagState;
   const dogName = s.dogName?.trim() || "seu cão";
+  const hasName = !!s.dogName?.trim();
+  const dogG = hasName ? getDogGender(s.dogName) : "m";
+  const _do = articleDe(dogG); // "do" ou "da"
   const level = s.level || 3;
   const breed = s.breed || "—";
   const age = s.age || "—";
@@ -154,15 +158,15 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
 
       {/* Body */}
       <main className="quiz-body">
-        <h1 className="text-center text-[20px] font-extrabold leading-tight text-foreground">
-          Diagnóstico comportamental do <span className="text-primary">{dogName}</span>
+        <h1 className="text-center text-[18px] font-extrabold leading-tight text-foreground">
+          Diagnóstico comportamental {_do} <span className="text-highlight">{dogName}</span>
         </h1>
-        <p className="mt-2 text-center text-[13px] leading-relaxed text-muted-foreground">
+        <p className="mt-1.5 text-center text-[12px] leading-relaxed text-muted-foreground">
           Com base nas suas respostas, analisamos o perfil do seu cão para criar o melhor plano de treino.
         </p>
 
         {/* Card 1 - Perfil identificado */}
-        <div className="mt-4 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="mt-3 rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <User className="h-4 w-4 text-primary" />
             <h2 className="text-[14px] font-bold text-foreground">Perfil identificado</h2>
@@ -190,14 +194,14 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
         </div>
 
         {/* Card 2 - Nível atual (simplificado) */}
-        <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="mt-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 className="h-4 w-4 text-primary" />
             <h2 className="text-[14px] font-bold text-foreground">Nível atual</h2>
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <p className="text-[36px] font-extrabold leading-none text-primary">
+            <p className="text-[36px] font-extrabold leading-none text-highlight">
               {level}/5
             </p>
             <div className="flex gap-2">
@@ -215,7 +219,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
         </div>
 
         {/* Card 3 - Objetivo (substitui Análise) */}
-        <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="mt-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <Search className="h-4 w-4 text-primary" />
             <h2 className="text-[14px] font-bold text-foreground">Objetivo</h2>
@@ -229,7 +233,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
         </div>
 
         {/* Card 4 - Evolução em 21 Dias */}
-        <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="mt-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-primary" />
             <h2 className="text-[14px] font-bold text-foreground">Evolução em 21 Dias</h2>
@@ -273,7 +277,7 @@ const Diagnosis = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _
         </div>
 
         {/* Card 5 - Boa notícia! */}
-        <div className="mt-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="mt-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full" style={{ background: "var(--gradient-primary)" }}>
               <Shield className="h-5 w-5 text-white" />
