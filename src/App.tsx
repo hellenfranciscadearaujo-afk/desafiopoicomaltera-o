@@ -41,9 +41,11 @@ function FunnelOrchestrator() {
 
   useEffect(() => {
     trackPageView();
-    // Pré-carrega Index em background 1.5s depois (sem competir com first paint)
-    const t = setTimeout(() => { import("./pages/Index.tsx"); }, 1500);
-    return () => clearTimeout(t);
+    // Pré-carrega as próximas páginas IMEDIATAMENTE em paralelo (sem delay).
+    // Quando a barra de 5s da Home terminar e o usuário clicar, a próxima
+    // tela aparece instantaneamente porque o chunk já está baixado.
+    import("./pages/Index.tsx");
+    import("./pages/Loading.tsx");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
