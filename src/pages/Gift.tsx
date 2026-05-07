@@ -1,8 +1,8 @@
 /**
  * Gift.tsx — Tela de presente surpresa antes da oferta
  *
- * Headline → Caixa de presente azul navy + animação → ao clicar abre revelando 61% OFF
- * → Cupom personalizado POI61[NOME] → Botão "Receber meu presente" dispara Lead → /oferta
+ * Headline → Caixa de presente azul navy + animação → ao clicar abre revelando 68% OFF
+ * → Cupom personalizado POI68[NOME] → Botão "Receber meu presente" dispara Lead → /oferta
  */
 
 import { useState } from "react";
@@ -31,9 +31,9 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
   const _do = articleDe(dogG); // "do" ou "da" — reservado para uso futuro
   void _do;
 
-  // Cupom: POI61 + 4 primeiras letras do nome em maiúsculo (ou POI61 sozinho se vazio)
+  // Cupom: POI68 + 4 primeiras letras do nome em maiúsculo (ou POI68 sozinho se vazio)
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
-  const coupon = `POI61${couponSuffix}`;
+  const coupon = `POI68${couponSuffix}`;
 
   const [opened, setOpened] = useState(false);
 
@@ -255,7 +255,7 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
               </div>
             )}
 
-            {/* Presente aberto - 61% OFF + cupom */}
+            {/* Presente aberto - 68% OFF + cupom */}
             {opened && (
               <div
                 className="relative flex h-full w-full flex-col items-center justify-center rounded-3xl overflow-hidden px-3"
@@ -269,7 +269,7 @@ const Gift = ({ _navigate, _initialState = {} }: { _navigate: NavigateFn; _initi
                   Desconto exclusivo
                 </p>
                 <p className="text-[60px] font-extrabold leading-none text-white mt-1">
-                  61%
+                  68%
                 </p>
                 <p className="text-[18px] font-bold text-white">OFF</p>
 

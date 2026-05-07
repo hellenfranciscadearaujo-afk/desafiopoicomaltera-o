@@ -32,7 +32,7 @@ interface Props {
   dogName: string;
   /** "do" ou "da" — preposição com artigo já flexionada */
   artDe: "do" | "da";
-  /** Cupom ex: POI61LUNA */
+  /** Cupom ex: POI68LUNA */
   coupon: string;
   /** Tempo restante já formatado, ex "09:42" */
   timer: string;
@@ -219,13 +219,13 @@ export default function OfferSummaryModal({ open, onClose, checkoutUrl, dogName,
             paddingBottom: "max(env(safe-area-inset-bottom), 16px)",
           }}
         >
-          {/* Resumo de preço — De R$150,00 por apenas R$57,90 */}
+          {/* Resumo de preço — De R$118,00 por apenas R$37,90 */}
           <p className="mb-2.5 text-center text-[14px] font-medium" style={{ color: "hsl(220 25% 35%)" }}>
             De{" "}
-            <span className="text-slate-400 line-through">R$ 150,00</span>{" "}
+            <span className="text-slate-400 line-through">R$ 118,00</span>{" "}
             <span style={{ color: "hsl(220 25% 35%)" }}>por apenas</span>{" "}
             <span className="text-[17px] font-extrabold" style={{ color: GREEN_SOLID }}>
-              R$ 57,90
+              R$ 37,90
             </span>
           </p>
 

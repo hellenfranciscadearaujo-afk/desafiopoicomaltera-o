@@ -9,23 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://connect.facebook.net" />
-    <link rel="dns-prefetch" href="https://www.facebook.com" />
 
-    <!-- Preload de assets críticos é feito via JS no main.tsx (Vite resolve o hash em produção) -->
-
-    <!-- Modulepreload do entry point — começa a baixar o JS antes do parser chegar no <script> -->
-    <link rel="modulepreload" href="/src/main.tsx" />
-
-    <!-- Fonte Inter carregada de forma NÃO-BLOQUEANTE (não trava a renderização) -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    </noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="DesafioPOI — Diagnóstico POI em 21 Dias">
@@ -79,13 +64,13 @@
     <div id="root"></div>
 
     <script>
-      // Se em 6s o splash ainda existir (React não montou), mostra fallback.
+      // Se em 12s o splash ainda existir (React não montou), mostra fallback.
       setTimeout(function(){
         var el = document.getElementById("initial-splash");
         if (el && !el.classList.contains("hidden")) {
           el.classList.add("timeout");
         }
-      }, 6000);
+      }, 12000);
     </script>
 
     <script type="module" src="/src/main.tsx"></script>

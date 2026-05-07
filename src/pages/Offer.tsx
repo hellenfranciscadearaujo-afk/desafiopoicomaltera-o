@@ -23,9 +23,9 @@ const Offer = ({ _initialState = {} }: { _initialState?: OfferState }) => {
   const dogG = hasName ? getDogGender(s.dogName) : "m";
   const _o = article(dogG);    // "o" ou "a"
   const _do = articleDe(dogG); // "do" ou "da"
-  // Cupom igual ao da página Gift: POI61 + 4 primeiras letras do nome
+  // Cupom igual ao da página Gift: POI68 + 4 primeiras letras do nome
   const couponSuffix = (s.dogName || "").trim().slice(0, 4).toUpperCase().replace(/[^A-ZÀ-Ú]/g, "");
-  const coupon = `POI61${couponSuffix}`;
+  const coupon = `POI68${couponSuffix}`;
   const breed = s.breed || "—";
   const age = s.age || "—";
   const level = s.level || 3;
@@ -495,7 +495,7 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, onCTAClick }: { ctaLabel: string;
       boxShadow: "0 8px 24px rgba(245,158,11,0.18)",
     }}
   >
-    {/* Topo — timer + cupom + 61% (com overflow hidden só na faixa colorida) */}
+    {/* Topo — timer + cupom + 68% (com overflow hidden só na faixa colorida) */}
     <div
       className="flex items-center justify-center gap-1.5 px-3 py-2 text-white text-[12px] font-extrabold flex-wrap rounded-t-xl"
       style={{
@@ -508,12 +508,12 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, onCTAClick }: { ctaLabel: string;
       <span style={{ opacity: 0.7 }}>·</span>
       <span className="tracking-widest">{coupon}</span>
       <span style={{ opacity: 0.7 }}>·</span>
-      <span>61% DE DESCONTO</span>
+      <span>68% DE DESCONTO</span>
     </div>
 
     {/* Corpo — 2 colunas (preço) */}
     <div className="relative px-4 pt-4 pb-3">
-      {/* Selo 61% OFF circular — flutuante acima do card, sem sobrepor preços */}
+      {/* Selo 68% OFF circular — flutuante acima do card, sem sobrepor preços */}
       <div
         className="absolute flex h-14 w-14 items-center justify-center rounded-full text-white text-[11px] font-extrabold leading-tight text-center"
         style={{
@@ -525,18 +525,18 @@ const OfferCard = ({ ctaLabel, coupon, mm, ss, onCTAClick }: { ctaLabel: string;
           zIndex: 2,
         }}
       >
-        61%<br />OFF
+        68%<br />OFF
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <div className="text-center">
           <p className="text-[12px] font-medium text-muted-foreground mb-1">De:</p>
-          <p className="text-[18px] font-bold text-muted-foreground line-through">R$ 150,00</p>
+          <p className="text-[18px] font-bold text-muted-foreground line-through">R$ 118,00</p>
         </div>
         <div className="text-center">
           <p className="text-[12px] font-medium text-muted-foreground mb-1">Por apenas:</p>
           <p className="text-[24px] font-extrabold leading-none" style={{ color: "hsl(142,70%,38%)" }}>
-            R$ 57,90
+            R$ 37,90
           </p>
         </div>
       </div>
